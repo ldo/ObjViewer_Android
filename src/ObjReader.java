@@ -40,7 +40,7 @@ public class ObjReader
       {
         private final java.io.InputStream Input;
         public boolean EOL, EOF;
-        private boolean LastWasCR;
+        private boolean LastWasCR, InComment;
         public int LineNr, ColNr;
 
         public void Fail
@@ -68,6 +68,7 @@ public class ObjReader
             EOL = false;
             EOF = false;
             LastWasCR = false;
+            InComment = false;
             LineNr = 1;
             ColNr = 0;
           } /*ObjTokenizer*/
@@ -95,11 +96,6 @@ public class ObjReader
             if (EOF)
               {
                 Fail("read past EOF");
-              } /*if*/
-            if (EOL)
-              {
-                ++LineNr;
-                ColNr = 0;
               } /*if*/
             ++ColNr;
             /*final*/ char Result
@@ -144,35 +140,37 @@ public class ObjReader
           /* fetches next symbol from current line, or null if none. */
           {
             final StringBuilder CurSym = new StringBuilder();
-            String Result = null;
             for (;;)
               {
                 if (EOL)
+                    break;
+                final char Ch = NextCh();
+                if (!InComment)
                   {
-                    if (CurSym.length() != 0)
+                    if (IsSeparator(Ch))
                       {
-                        Result = CurSym.toString();
+                        if (CurSym.length() != 0)
+                            break;
+                      }
+                    else if (Ch == '#')
+                      {
+                        InComment = true;
                       }
                     else
                       {
-                        if (Required)
-                          {
-                            Fail("missing required symbol");
-                          } /*if*/
+                        CurSym.appendCodePoint((int)Ch);
                       } /*if*/
-                    break;
-                  } /*if*/
-                final char Ch = NextCh();
-                if (IsSeparator(Ch))
-                  {
-                    if (CurSym.length() != 0)
-                        break;
-                  }
-                else
-                  {
-                    CurSym.appendCodePoint((int)Ch);
                   } /*if*/
               } /*for*/
+            final String Result =
+                CurSym.length() != 0 ?
+                    CurSym.toString()
+                :
+                    null;
+            if (Result == null && Required)
+              {
+                Fail("missing required symbol");
+              } /*if*/
             return
                 Result;
           } /*NextSym*/
@@ -187,12 +185,18 @@ public class ObjReader
                 final char Ch = NextCh();
                 if (IsEOL(Ch))
                     break;
-                if (!IsSeparator(Ch))
+                if (!InComment && !IsSeparator(Ch))
                   {
                     Fail("unexpected stuff at end of line");
                   } /*if*/
               } /*for*/
             EOL = false;
+            if (!EOF)
+              {
+                ++LineNr;
+                ColNr = 0;
+              } /*if*/
+            InComment = false;
           } /*EndLine*/
 
         public GeomBuilder.Vec3f GetVec()
@@ -298,7 +302,7 @@ public class ObjReader
                       {
                         Faces = new ArrayList<FaceVert[]>();
                       } /*if*/
-                    ArrayList<FaceVert> FaceVerts = new ArrayList<FaceVert>();
+                    final ArrayList<FaceVert> FaceVerts = new ArrayList<FaceVert>();
                     for (;;)
                       {
                         final String VertStr = Parse.NextSym(false);
@@ -317,7 +321,7 @@ public class ObjReader
                                     break;
                                 ++ThisPos;
                               } /*for*/
-                            if (ThisPos > LastPos + 1)
+                            if (ThisPos > LastPos)
                               {
                                 int ThisComponent
                                     = -1; /*sigh*/
