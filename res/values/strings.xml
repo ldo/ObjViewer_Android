@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ObjViewer</string>
+
+  <!-- menu items -->
+    <string name="pick_file">Open...</string>
+
+  <!-- prompts -->
+    <string name="picker_prompt">Select .obj File</string>
+
+  <!-- buttons -->
+    <string name="open">Open</string>
+
+  <!-- messagesin -->
+    <string name="obj_load_fail">Error loading file: %s</string>
+</resources>
