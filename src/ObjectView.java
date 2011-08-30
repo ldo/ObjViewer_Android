@@ -1,14 +1,14 @@
 package nz.gen.geek_central.ObjViewer;
 
 import javax.microedition.khronos.opengles.GL10;
-import nz.gen.geek_central.GLUseful.GeomBuilder;
+import nz.gen.geek_central.GLUseful.ObjReader;
 import nz.gen.geek_central.GLUseful.Rotation;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 
 public class ObjectView extends android.opengl.GLSurfaceView
   {
-    private GeomBuilder.Obj TheObject = null;
+    private ObjReader.Model TheObject = null;
     private boolean UseLighting = false;
     private Rotation CurRotation = new Rotation(0, 0, 0, 1);
     private PointF LastMouse = null;
@@ -218,7 +218,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
 
     public void SetObject
       (
-        GeomBuilder.Obj NewObject
+        ObjReader.Model NewObject
       )
       {
         TheObject = NewObject;

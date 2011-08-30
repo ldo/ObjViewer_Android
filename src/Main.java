@@ -68,11 +68,37 @@ public class Main extends android.app.Activity
                     android.content.Intent Data
                   )
                   {
-                    final String FileName = Data.getData().getPath();
-                    nz.gen.geek_central.GLUseful.GeomBuilder.Obj NewObj = null;
+                    final String ObjFileName = Data.getData().getPath();
+                    ObjReader.Model NewObj = null;
                     try
                       {
-                        NewObj = ObjReader.Read(FileName);
+                        NewObj = ObjReader.ReadObj
+                          (
+                            /*FileName =*/ ObjFileName,
+                            /*LoadMaterials =*/
+                                new ObjReader.MaterialLoader()
+                                  {
+                                    public ObjReader.MaterialSet Load
+                                      (
+                                        ObjReader.MaterialSet Materials,
+                                        String MatFileName
+                                      )
+                                      {
+                                        return
+                                            ObjReader.ReadMaterials
+                                              (
+                                                /*FileName =*/
+                                                    new java.io.File
+                                                      (
+                                                        new java.io.File(ObjFileName)
+                                                            .getParentFile(),
+                                                        MatFileName
+                                                      ).getPath(),
+                                                /*CurMaterials =*/ Materials
+                                              );
+                                      } /*Load*/
+                                  } /*MaterialLoader*/
+                          );
                       }
                     catch (ObjReader.DataFormatException Failed)
                       {

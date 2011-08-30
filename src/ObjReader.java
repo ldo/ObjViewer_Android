@@ -1,6 +1,6 @@
 package nz.gen.geek_central.GLUseful;
 /*
-    Basic reader for .obj 3D model files.
+    Basic reader for .obj 3D model files and associated .mtl material files.
 
     Copyright 2011 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
 
@@ -18,12 +18,13 @@ package nz.gen.geek_central.GLUseful;
 */
 
 import java.util.ArrayList;
+import javax.microedition.khronos.opengles.GL10;
 
 public class ObjReader
   {
 
     public static class DataFormatException extends RuntimeException
-      /* indicates a problem parsing a .obj file. */
+      /* indicates a problem parsing file contents. */
       {
 
         public DataFormatException
@@ -35,6 +36,154 @@ public class ObjReader
           } /*DataFormatException*/
 
       } /*DataFormatException*/
+
+    public static class Material
+      {
+        public final String Name;
+      /* no support for texture files, functions or any of that stuff */
+        public final GeomBuilder.Color
+            AmbientColor, DiffuseColor, SpecularColor;
+        public final float SpecularExponent;
+        public final int Illum; /* NYI for now? */
+
+        public Material
+          (
+            String Name,
+          /* all following parameters optional, alpha components ignored, taken from Dissolve */
+            GeomBuilder.Color AmbientColor,
+            GeomBuilder.Color DiffuseColor,
+            GeomBuilder.Color SpecularColor,
+            Float SpecularExponent,
+            Float Dissolve,
+            Integer Illum
+          )
+          {
+            this.Name = Name;
+            final float Alpha = Dissolve != null ? Dissolve : 1.0f;
+            this.AmbientColor =
+                AmbientColor != null ?
+                    new GeomBuilder.Color
+                      (
+                        AmbientColor.r,
+                        AmbientColor.g,
+                        AmbientColor.b,
+                        Alpha
+                      )
+                :
+                    new GeomBuilder.Color(1.0f, 1.0f, 1.0f, Alpha);
+            this.DiffuseColor =
+                DiffuseColor != null ?
+                    new GeomBuilder.Color
+                      (
+                        DiffuseColor.r,
+                        DiffuseColor.g,
+                        DiffuseColor.b,
+                        Alpha
+                      )
+                :
+                    new GeomBuilder.Color(1.0f, 1.0f, 1.0f, Alpha);
+            this.SpecularColor =
+                SpecularColor != null ?
+                    new GeomBuilder.Color
+                      (
+                        SpecularColor.r,
+                        SpecularColor.g,
+                        SpecularColor.b,
+                        Alpha
+                      )
+                :
+                    new GeomBuilder.Color(1.0f, 1.0f, 1.0f, Alpha);
+            this.SpecularExponent = SpecularExponent != null ? SpecularExponent : 100.0f /*?*/;
+            this.Illum = Illum != null ? Illum : 0 /*?*/;
+          } /*Material*/
+
+        public void Apply
+          (
+            GL10 gl
+          )
+          /* sets the material settings into the GL context. */
+          {
+          /* Illum NYI */
+            gl.glMaterialfv
+              (
+                /*face =*/ GL10.GL_FRONT_AND_BACK,
+                /*pname =*/ GL10.GL_AMBIENT,
+                /*params =*/
+                    new float[]
+                        {
+                            AmbientColor.r,
+                            AmbientColor.g,
+                            AmbientColor.b,
+                            AmbientColor.a,
+                        },
+                /*offset =*/ 0
+              );
+            gl.glMaterialfv
+              (
+                /*face =*/ GL10.GL_FRONT_AND_BACK,
+                /*pname =*/ GL10.GL_DIFFUSE,
+                /*params =*/
+                    new float[]
+                        {
+                            DiffuseColor.r,
+                            DiffuseColor.g,
+                            DiffuseColor.b,
+                            DiffuseColor.a,
+                        },
+                /*offset =*/ 0
+              );
+            gl.glMaterialfv
+              (
+                /*face =*/ GL10.GL_FRONT_AND_BACK,
+                /*pname =*/ GL10.GL_SPECULAR,
+                /*params =*/
+                    new float[]
+                        {
+                            SpecularColor.r,
+                            SpecularColor.g,
+                            SpecularColor.b,
+                            SpecularColor.a,
+                        },
+                /*offset =*/ 0
+              );
+            gl.glMaterialf
+              (
+                /*face =*/ GL10.GL_FRONT_AND_BACK,
+                /*pname =*/ GL10.GL_SHININESS,
+                /*param =*/ SpecularExponent
+              );
+          } /*Apply*/
+
+      } /*Material*/
+
+    public static class MaterialSet
+      /* a mapping from material names to material definitions */
+      {
+        private final java.util.Map<String, Material> Materials =
+            new java.util.HashMap<String, Material>();
+
+        public MaterialSet()
+          {
+          } /*MaterialSet*/
+
+        public void Add
+          (
+            Material TheMaterial
+          )
+          {
+            Materials.put(TheMaterial.Name, TheMaterial);
+          } /*Add*/
+
+        public Material Get
+          (
+            String Name
+          )
+          {
+            return
+                Materials.get(Name);
+          } /*Get*/
+
+      } /*MaterialSet*/
 
     private static class ObjTokenizer
       {
@@ -199,6 +348,24 @@ public class ObjReader
             InComment = false;
           } /*EndLine*/
 
+        public float GetFloat
+          (
+            String Description
+          )
+          {
+            float Result = 0.0f;
+            try
+              {
+                Result = Float.parseFloat(NextSym(true));
+              }
+            catch (NumberFormatException BadNum)
+              {
+                Fail("bad " + Description);
+              } /*try*/
+            return
+                Result;
+          } /*GetFloat*/
+
         public GeomBuilder.Vec3f GetVec()
           {
             final String XStr = NextSym(true);
@@ -218,10 +385,36 @@ public class ObjReader
             catch (NumberFormatException BadNum)
               {
                 Fail("bad vector coordinate");
-              } /*catch*/
+              } /*try*/
             return
                 Result;
           } /*GetVec*/
+
+        public GeomBuilder.Color GetColor()
+          {
+          /* colours in .obj don't have individual alpha */
+            final String RStr = NextSym(true);
+            final String GStr = NextSym(true);
+            final String BStr = NextSym(true);
+            /*final*/ GeomBuilder.Color Result
+                = null; /*sigh*/
+            try
+              {
+                Result = new GeomBuilder.Color
+                  (
+                    Float.parseFloat(RStr),
+                    Float.parseFloat(GStr),
+                    Float.parseFloat(BStr),
+                    1.0f
+                  );
+              }
+            catch (NumberFormatException BadNum)
+              {
+                Fail("bad RGB colour component");
+              } /*try*/
+            return
+                Result;
+          } /*GetColor*/
 
         public void SkipRest()
           {
@@ -251,9 +444,72 @@ public class ObjReader
 
       } /*FaceVert*/
 
-    public static GeomBuilder.Obj Read
+    public interface MaterialLoader
+      {
+
+        public MaterialSet Load
+          (
+            MaterialSet PrevMaterials, /* can simply add to this or replace it */
+            String FileName
+          );
+
+      } /*MaterialLoader*/
+
+    public static class Model
+      {
+        public final GeomBuilder.Vec3f BoundMin, BoundMax;
+
+        private static class Component
+          {
+            private final Material ObjMaterial; /* optional */
+            private final GeomBuilder.Obj ObjGeometry;
+
+            private Component
+              (
+                Material ObjMaterial,
+                GeomBuilder.Obj ObjGeometry
+              )
+              {
+                this.ObjMaterial = ObjMaterial;
+                this.ObjGeometry = ObjGeometry;
+              } /*Component*/
+          } /*Component*/
+
+        private final Component[] Components;
+
+        private Model
+          (
+            Component[] Components,
+            GeomBuilder.Vec3f BoundMin,
+            GeomBuilder.Vec3f BoundMax
+          )
+          {
+            this.Components = Components;
+            this.BoundMin = BoundMin;
+            this.BoundMax = BoundMax;
+          } /*Model*/
+
+        public void Draw
+          (
+            GL10 gl
+          )
+          {
+            for (Component ThisComponent : Components)
+              {
+                if (ThisComponent.ObjMaterial != null)
+                  {
+                    ThisComponent.ObjMaterial.Apply(gl);
+                  } /*if*/
+                ThisComponent.ObjGeometry.Draw(gl);
+              } /*for*/
+          } /*Draw*/
+
+      } /*Model*/
+
+    public static Model ReadObj
       (
-        java.io.InputStream From
+        java.io.InputStream From,
+        MaterialLoader LoadMaterials
       )
     throws DataFormatException
       {
@@ -263,12 +519,116 @@ public class ObjReader
             TexCoords = null,
             Normals = null;
         ArrayList<FaceVert[]> Faces = null;
+        MaterialSet LoadedMaterials = new MaterialSet();
+        final ArrayList<Model.Component> ModelComponents = new ArrayList<Model.Component>();
+        Material CurMaterial = null;
+        GeomBuilder.Vec3f
+            BoundMin = null,
+            BoundMax = null;
         for (;;)
           {
-            final String OpStr = Parse.NextSym(false);
-            if (OpStr != null)
+            String Op = Parse.NextSym(false);
+            if (Op != null)
               {
-                final String Op = OpStr.intern();
+                Op = Op.intern();
+              } /*if*/
+            if (Op == null && Parse.EOF || Op == "usemtl")
+              {
+                if (Faces != null)
+                  {
+                  /* finish last object */
+                    final GeomBuilder Geom = new GeomBuilder
+                      (
+                        /*GotNormals =*/ Normals != null,
+                        /*GotTexCoords =*/ TexCoords != null,
+                        /*GotColors =*/ false
+                      );
+                    final java.util.Map<FaceVert, Integer> FaceMap =
+                        new java.util.HashMap<FaceVert, Integer>();
+                    for (FaceVert[] Face : Faces)
+                      {
+                        for (FaceVert Vert : Face)
+                          {
+                            if (!FaceMap.containsKey(Vert))
+                              {
+                                FaceMap.put
+                                  (
+                                    Vert,
+                                    Geom.Add
+                                      (
+                                        /*Vertex =*/ Vertices.get(Vert.VertIndex),
+                                        /*Normal =*/
+                                            Vert.NormalIndex != null ?
+                                                Normals.get(Vert.NormalIndex)
+                                            :
+                                                null,
+                                        /*TexCoord =*/
+                                            Vert.TexCoordIndex != null ?
+                                                TexCoords.get(Vert.TexCoordIndex)
+                                            :
+                                                null,
+                                        /*VertexColor =*/ null
+                                      )
+                                  );
+                              } /*if*/
+                          } /*for*/
+                        final int[] FaceVerts = new int[Face.length];
+                        for (int i = 0; i < Face.length; ++i)
+                          {
+                            FaceVerts[i] = FaceMap.get(Face[i]);
+                          } /*for*/
+                        switch (FaceVerts.length)
+                          {
+                        case 3:
+                            Geom.AddTri(FaceVerts[0], FaceVerts[1], FaceVerts[2]);
+                        break;
+                        case 4:
+                            Geom.AddQuad(FaceVerts[0], FaceVerts[1], FaceVerts[2], FaceVerts[3]);
+                        break;
+                          } /*switch*/
+                      } /*for*/
+                    final GeomBuilder.Obj NewObj = Geom.MakeObj();
+                    if (BoundMin != null)
+                      {
+                        BoundMin =
+                            new GeomBuilder.Vec3f
+                              (
+                                Math.min(BoundMin.x, NewObj.BoundMin.x),
+                                Math.min(BoundMin.y, NewObj.BoundMin.y),
+                                Math.min(BoundMin.z, NewObj.BoundMin.z)
+                              );
+                      }
+                    else
+                      {
+                        BoundMin = NewObj.BoundMin;
+                      } /*if*/
+                    if (BoundMax != null)
+                      {
+                        BoundMax =
+                            new GeomBuilder.Vec3f
+                              (
+                                Math.max(BoundMax.x, NewObj.BoundMax.x),
+                                Math.max(BoundMax.y, NewObj.BoundMax.y),
+                                Math.max(BoundMax.z, NewObj.BoundMax.z)
+                              );
+                      }
+                    else
+                      {
+                        BoundMax = NewObj.BoundMax;
+                      } /*if*/
+                    ModelComponents.add
+                      (
+                        new Model.Component(CurMaterial, NewObj)
+                      );
+                    Faces = null;
+                  } /*if*/
+                if (Op != null)
+                  {
+                    CurMaterial = LoadedMaterials.Get(Parse.NextSym(true));
+                  } /*if*/
+              }
+            else if (Op != null)
+              {
                 if (Op == "v")
                   {
                     final GeomBuilder.Vec3f Vec = Parse.GetVec();
@@ -335,7 +695,7 @@ public class ObjReader
                                 catch (NumberFormatException BadNum)
                                   {
                                     Parse.Fail("bad vertex index");
-                                  } /*catch*/
+                                  } /*try*/
                                 switch (Which)
                                   {
                                 case 0:
@@ -396,27 +756,6 @@ public class ObjReader
                                     NormalIndex = ThisComponent;
                                 break;
                                   } /*switch*/
-                              }
-                            else
-                              {
-                                switch (Which)
-                                  {
-                                case 0:
-                                    Parse.Fail("missing vertex reference");
-                                break;
-                                case 1:
-                                    if (TexCoords != null)
-                                      {
-                                        Parse.Fail("missing texcoord reference");
-                                      } /*if*/
-                                break;
-                                case 2:
-                                    if (Normals != null)
-                                      {
-                                        Parse.Fail("missing normal reference");
-                                      } /*if*/
-                                break;
-                                  }
                               } /*if*/
                             ++Which;
                             if (ThisPos == VertStr.length())
@@ -427,6 +766,18 @@ public class ObjReader
                               } /*if*/
                             ++ThisPos; /* skip slash */
                           } /*for*/
+                        if (VertIndex == null)
+                          {
+                            Parse.Fail("missing vertex reference");
+                          } /*if*/
+                        if (TexCoordIndex == null && TexCoords != null)
+                          {
+                            Parse.Fail("missing texcoord reference");
+                          } /*if*/
+                        if (NormalIndex == null && Normals != null)
+                          {
+                            Parse.Fail("missing normal reference");
+                          } /*if*/
                         FaceVerts.add(new FaceVert(VertIndex, TexCoordIndex, NormalIndex));
                       } /*for*/
                     if (FaceVerts.size() < 3 || FaceVerts.size() > 4)
@@ -435,11 +786,30 @@ public class ObjReader
                       } /*if*/
                     Faces.add(FaceVerts.toArray(new FaceVert[FaceVerts.size()]));
                   }
+                else if (Op == "mtllib")
+                  {
+                    boolean First = true;
+                    for (;;) /* expect one or more materials library file names */
+                      {
+                        final String LibName = Parse.NextSym(First);
+                        if (LibName == null)
+                            break;
+                        LoadedMaterials = LoadMaterials.Load(LoadedMaterials, LibName);
+                        if (LoadedMaterials == null)
+                          {
+                            Parse.Fail
+                              (
+                                "materials loader didn't return anything"
+                              );
+                          } /*if*/
+                        First = false;
+                      } /*for*/
+                  }
                 else
                   {
                     System.err.printf
                       (
-                        "ObjReader warning: ignoring op \"%s\" on line %d.\n",
+                        "ObjReader.ReadObj warning: ignoring op \"%s\" on line %d.\n",
                         Op,
                         Parse.LineNr
                       );
@@ -447,73 +817,130 @@ public class ObjReader
                   } /*if*/
               } /*if*/
             Parse.EndLine();
-            if (Parse.EOF)
+            if (Parse.EOF && Faces == null)
                 break;
           } /*for*/
-        if (Faces == null)
+        return
+            new Model
+              (
+                ModelComponents.toArray(new Model.Component[ModelComponents.size()]),
+                BoundMin,
+                BoundMax
+              );
+      } /*ReadObj*/
+
+    public static MaterialSet ReadMaterials
+      (
+        java.io.InputStream From,
+        MaterialSet CurMaterials
+      )
+      {
+        final ObjTokenizer Parse = new ObjTokenizer(From);
+        String MaterialName = null;
+        GeomBuilder.Color
+            AmbientColor = null,
+            DiffuseColor = null,
+            SpecularColor = null;
+        Float
+            SpecularExponent = null,
+            Dissolve = null;
+        Integer
+            Illum = null;
+        for (;;)
           {
-            throw new DataFormatException("ObjReader error: no faces defined");
-          } /*if*/
-        final GeomBuilder Geom = new GeomBuilder
-          (
-            /*GotNormals =*/ Normals != null,
-            /*GotTexCoords =*/ TexCoords != null,
-            /*GotColors =*/ false
-          );
-        final java.util.Map<FaceVert, Integer> FaceMap = new java.util.HashMap<FaceVert, Integer>();
-        for (FaceVert[] Face : Faces)
-          {
-            for (FaceVert Vert : Face)
+            String Op = Parse.NextSym(false);
+            if (Op != null)
               {
-                if (!FaceMap.containsKey(Vert))
+                Op = Op.intern();
+              } /*if*/
+            if (Op == null && Parse.EOF || Op == "newmtl")
+              {
+                if (MaterialName != null)
                   {
-                    FaceMap.put
-                      (
-                        Vert,
-                        Geom.Add
+                    if (!CurMaterials.Materials.containsKey(MaterialName)) /* let earlier entry take precedence */
+                      {
+                        CurMaterials.Materials.put
                           (
-                            /*Vertex =*/ Vertices.get(Vert.VertIndex),
-                            /*Normal =*/
-                                Vert.NormalIndex != null ?
-                                    Normals.get(Vert.NormalIndex)
-                                :
-                                    null,
-                            /*TexCoord =*/
-                                Vert.TexCoordIndex != null ?
-                                    TexCoords.get(Vert.TexCoordIndex)
-                                :
-                                    null,
-                            /*VertexColor =*/ null
-                          )
-                      );
+                            MaterialName,
+                            new Material
+                              (
+                                /*Name =*/ MaterialName,
+                                /*AmbientColor =*/ AmbientColor,
+                                /*DiffuseColor =*/ DiffuseColor,
+                                /*SpecularColor =*/ SpecularColor,
+                                /*SpecularExponent =*/ SpecularExponent,
+                                /*Dissolve =*/ Dissolve,
+                                /*Illum =*/ Illum
+                              )
+                          );
+                      } /*if*/
+                    MaterialName = null;
                   } /*if*/
-              } /*for*/
-            final int[] FaceVerts = new int[Face.length];
-            for (int i = 0; i < Face.length; ++i)
+                if (Op != null)
+                  {
+                    MaterialName = Parse.NextSym(true).intern();
+                    AmbientColor = null;
+                    DiffuseColor = null;
+                    SpecularColor = null;
+                    SpecularExponent = null;
+                    Dissolve = null;
+                    Illum = null;
+                  } /*if*/
+              }
+            else if (Op != null)
               {
-                FaceVerts[i] = FaceMap.get(Face[i]);
-              } /*for*/
-            switch (FaceVerts.length)
-              {
-            case 3:
-                Geom.AddTri(FaceVerts[0], FaceVerts[1], FaceVerts[2]);
-            break;
-            case 4:
-                Geom.AddQuad(FaceVerts[0], FaceVerts[1], FaceVerts[2], FaceVerts[3]);
-            break;
-              } /*switch*/
+                if (MaterialName == null)
+                  {
+                    Parse.Fail("material definition doesn’t begin with “newmtl”");
+                  } /*if*/
+                if (Op == "Ka")
+                  {
+                    AmbientColor = Parse.GetColor();
+                  }
+                else if (Op == "Kd")
+                  {
+                    DiffuseColor = Parse.GetColor();
+                  }
+                else if (Op == "Ks")
+                  {
+                    SpecularColor = Parse.GetColor();
+                  }
+                else if (Op == "Ns")
+                  {
+                    SpecularExponent = Parse.GetFloat("specular exponent");
+                  }
+                else if (Op == "d")
+                  {
+                    Dissolve = Parse.GetFloat("dissolve");
+                  }
+              /* "illum" NYI */
+                else
+                  {
+                    System.err.printf
+                      (
+                        "ObjReader.ReadMaterials warning: ignoring op \"%s\" on line %d.\n",
+                        Op,
+                        Parse.LineNr
+                      );
+                    Parse.SkipRest();
+                  } /*if*/
+              } /*if*/
+            Parse.EndLine();
+            if (Parse.EOF && MaterialName == null)
+                break;
           } /*for*/
         return
-            Geom.MakeObj();
-      } /*Read*/
+            CurMaterials;
+      } /*ReadMaterials*/
 
-    public static GeomBuilder.Obj Read
+    public static Model ReadObj
       (
-        String FileName
+        String FileName,
+        MaterialLoader LoadMaterials
       )
     throws DataFormatException
       {
-        GeomBuilder.Obj Result = null;
+        Model Result = null;
         java.io.FileInputStream ReadFrom = null;
         try
           {
@@ -525,7 +952,7 @@ public class ObjReader
           } /*try*/
         if (ReadFrom != null)
           {
-            Result = Read(ReadFrom);
+            Result = ReadObj(ReadFrom, LoadMaterials);
             try
               {
                 ReadFrom.close();
@@ -537,6 +964,38 @@ public class ObjReader
           } /*if*/
         return
             Result;
-      } /*Read*/
+      } /*ReadObj*/
+
+    public static MaterialSet ReadMaterials
+      (
+        String FileName,
+        MaterialSet CurMaterials
+      )
+      {
+        MaterialSet Result = null;
+        java.io.FileInputStream ReadFrom = null;
+        try
+          {
+            ReadFrom = new java.io.FileInputStream(FileName);
+          }
+        catch (java.io.IOException IOError)
+          {
+            throw new DataFormatException("I/O error: " + IOError.toString());
+          } /*try*/
+        if (ReadFrom != null)
+          {
+            Result = ReadMaterials(ReadFrom, CurMaterials);
+            try
+              {
+                ReadFrom.close();
+              }
+            catch (java.io.IOException WhoCares)
+              {
+              /* I mean, really? */
+              } /*try*/
+          } /*if*/
+        return
+            Result;
+      } /*ReadMaterials*/
 
   } /*ObjReader*/
