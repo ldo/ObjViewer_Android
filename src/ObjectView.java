@@ -246,4 +246,10 @@ public class ObjectView extends android.opengl.GLSurfaceView
         requestRender();
       } /*SetUseLighting*/
 
+    public boolean GetUseLighting()
+      {
+        return
+            UseLighting;
+      } /*GetUseLighting*/
+
   } /*ObjectView*/

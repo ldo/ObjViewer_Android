@@ -5,14 +5,16 @@
   <!-- menu items -->
     <string name="pick_file">Open...</string>
     <string name="reset_view">Reset View</string>
-    <string name="lighting_on">Lighting On</string>
-    <string name="lighting_off">Lighting Off</string>
+    <string name="options_lighting">Lighting...</string>
 
   <!-- prompts -->
     <string name="picker_prompt">Select .obj File</string>
+    <string name="lighting_title">Lighting</string>
 
   <!-- buttons -->
     <string name="open">Open</string>
+    <string name="on">On</string>
+    <string name="off">Off</string>
 
   <!-- messages -->
     <string name="obj_load_fail">Error loading file: %s</string>

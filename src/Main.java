@@ -22,6 +22,108 @@ public class Main extends android.app.Activity
 
     java.util.Map<Integer, RequestResponseAction> ActivityResultActions;
 
+    private interface SelectedIDAction
+      {
+        public void Set
+          (
+            int SelectedID
+          ); 
+      } /*SelectedIDAction*/
+
+    private class OptionsDialog
+        extends android.app.Dialog
+        implements android.content.DialogInterface.OnDismissListener
+      {
+        private final android.content.Context ctx;
+        private final String Title;
+        private final SelectedIDAction Action;
+        private final int InitialButtonID;
+        private class ButtonDef
+          {
+            final String ButtonTitle;
+            final int ButtonID;
+
+            public ButtonDef
+              (
+                String ButtonTitle,
+                int ButtonID
+              )
+              {
+                this.ButtonTitle = ButtonTitle;
+                this.ButtonID = ButtonID;
+              } /*ButtonDef*/
+          } /*ButtonDef*/
+        private final java.util.ArrayList<ButtonDef> TheButtonDefs =
+            new java.util.ArrayList<ButtonDef>();
+        private android.widget.RadioGroup TheButtons;
+
+        public OptionsDialog
+          (
+            android.content.Context ctx,
+            String Title,
+            SelectedIDAction Action,
+            int InitialButtonID
+          )
+          {
+            super(ctx);
+            this.ctx = ctx;
+            this.Title = Title;
+            this.Action = Action;
+            this.InitialButtonID = InitialButtonID;
+          } /*OptionsDialog*/
+
+        public OptionsDialog AddButton
+          (
+            String ButtonTitle,
+            int ButtonID
+          )
+          {
+            TheButtonDefs.add(new ButtonDef(ButtonTitle, ButtonID));
+            return
+                this;
+          } /*AddButton*/
+
+        @Override
+        public void onCreate
+          (
+            android.os.Bundle savedInstanceState
+          )
+          {
+            setTitle(Title);
+            final android.widget.LinearLayout MainLayout = new android.widget.LinearLayout(ctx);
+            MainLayout.setOrientation(android.widget.LinearLayout.VERTICAL);
+            setContentView(MainLayout);
+            TheButtons = new android.widget.RadioGroup(ctx);
+            final android.view.ViewGroup.LayoutParams ButtonLayout =
+                new android.view.ViewGroup.LayoutParams
+                  (
+                    android.view.ViewGroup.LayoutParams.FILL_PARENT,
+                    android.view.ViewGroup.LayoutParams.WRAP_CONTENT
+                  );
+            for (ButtonDef ThisButtonDef : TheButtonDefs)
+              {
+                final android.widget.RadioButton ThisButton =
+                    new android.widget.RadioButton(ctx);
+                ThisButton.setText(ThisButtonDef.ButtonTitle);
+                ThisButton.setId(ThisButtonDef.ButtonID);
+                TheButtons.addView(ThisButton, TheButtons.getChildCount(), ButtonLayout);
+              } /*for*/
+            MainLayout.addView(TheButtons, ButtonLayout);
+            TheButtons.check(InitialButtonID);
+            setOnDismissListener(this);
+          } /*onCreate*/
+
+        @Override
+        public void onDismiss
+          (
+            android.content.DialogInterface TheDialog
+          )
+          {
+            Action.Set(TheButtons.getCheckedRadioButtonId());
+          } /*onDismiss*/
+
+      } /*OptionsDialog*/
+
     @Override
     public boolean onCreateOptionsMenu
       (
@@ -63,23 +165,32 @@ public class Main extends android.app.Activity
           );
         OptionsMenu.put
           (
-            TheMenu.add(R.string.lighting_on),
+            TheMenu.add(R.string.options_lighting),
             new Runnable()
               {
                 public void run()
                   {
+                    new OptionsDialog
+                      (
+                        /*ctx =*/ Main.this,
+                        /*Title =*/ getString(R.string.lighting_title),
+                        /*Action =*/
+                            new SelectedIDAction()
+                              {
+                                public void Set
+                                  (
+                                    int SelectedID
+                                  )
+                                  {
+                                    TheObjectView.SetUseLighting(SelectedID != 0);
+                                  } /*Set*/
+                              } /*SelectedIDAction*/,
+                        /*InitialButtonID =*/ TheObjectView.GetUseLighting() ? 1 : 0
+                      )
+                        .AddButton(getString(R.string.on), 1)
+                        .AddButton(getString(R.string.off), 0)
+                        .show();
                     TheObjectView.SetUseLighting(true);
-                  } /*run*/
-              } /*Runnable*/
-          );
-        OptionsMenu.put
-          (
-            TheMenu.add(R.string.lighting_off),
-            new Runnable()
-              {
-                public void run()
-                  {
-                    TheObjectView.SetUseLighting(false);
                   } /*run*/
               } /*Runnable*/
           );
