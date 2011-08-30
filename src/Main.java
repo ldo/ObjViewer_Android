@@ -190,7 +190,36 @@ public class Main extends android.app.Activity
                         .AddButton(getString(R.string.on), 1)
                         .AddButton(getString(R.string.off), 0)
                         .show();
-                    TheObjectView.SetUseLighting(true);
+                  } /*run*/
+              } /*Runnable*/
+          );
+        OptionsMenu.put
+          (
+            TheMenu.add(R.string.options_orient_faces),
+            new Runnable()
+              {
+                public void run()
+                  {
+                    new OptionsDialog
+                      (
+                        /*ctx =*/ Main.this,
+                        /*Title =*/ getString(R.string.orient_faces_title),
+                        /*Action =*/
+                            new SelectedIDAction()
+                              {
+                                public void Set
+                                  (
+                                    int SelectedID
+                                  )
+                                  {
+                                    TheObjectView.SetClockwiseFaces(SelectedID != 0);
+                                  } /*Set*/
+                              } /*SelectedIDAction*/,
+                        /*InitialButtonID =*/ TheObjectView.GetClockwiseFaces() ? 1 : 0
+                      )
+                        .AddButton(getString(R.string.anticlockwise), 0)
+                        .AddButton(getString(R.string.clockwise), 1)
+                        .show();
                   } /*run*/
               } /*Runnable*/
           );

@@ -6,15 +6,19 @@
     <string name="pick_file">Open...</string>
     <string name="reset_view">Reset View</string>
     <string name="options_lighting">Lighting...</string>
+    <string name="options_orient_faces">Orient Faces...</string>
 
   <!-- prompts -->
     <string name="picker_prompt">Select .obj File</string>
     <string name="lighting_title">Lighting</string>
+    <string name="orient_faces_title">Front Face Orientation</string>
 
   <!-- buttons -->
     <string name="open">Open</string>
     <string name="on">On</string>
     <string name="off">Off</string>
+    <string name="clockwise">Clockwise</string>
+    <string name="anticlockwise">Anticlockwise</string>
 
   <!-- messages -->
     <string name="obj_load_fail">Error loading file: %s</string>

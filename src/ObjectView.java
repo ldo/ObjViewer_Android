@@ -10,6 +10,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
   {
     private ObjReader.Model TheObject = null;
     private boolean UseLighting = false;
+    private boolean ClockwiseFaces = false;
     private Rotation CurRotation = new Rotation(0, 0, 0, 1);
     private PointF LastMouse = null;
 
@@ -86,6 +87,13 @@ public class ObjectView extends android.opengl.GLSurfaceView
                     - (TheObject.BoundMax.x + TheObject.BoundMin.x) / 2.0f,
                     - (TheObject.BoundMax.y + TheObject.BoundMin.y) / 2.0f,
                     - TheObject.BoundMax.z * 1.2f
+                  );
+                gl.glFrontFace
+                  (
+                    ClockwiseFaces ? 
+                        GL10.GL_CW
+                    :
+                        GL10.GL_CCW
                   );
                 TheObject.Draw(gl);
               } /*if*/
@@ -251,5 +259,20 @@ public class ObjectView extends android.opengl.GLSurfaceView
         return
             UseLighting;
       } /*GetUseLighting*/
+
+    public void SetClockwiseFaces
+      (
+        boolean ClockwiseFaces
+      )
+      {
+        this.ClockwiseFaces = ClockwiseFaces;
+        requestRender();
+      } /*SetClockwiseFaces*/
+
+    public boolean GetClockwiseFaces()
+      {
+        return
+            ClockwiseFaces;
+      } /*GetClockwiseFaces*/
 
   } /*ObjectView*/
