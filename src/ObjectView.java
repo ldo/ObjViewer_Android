@@ -64,6 +64,12 @@ public class ObjectView extends android.opengl.GLSurfaceView
                     gl.glDisable(GL10.GL_LIGHTING);
                   } /*if*/
                 CurRotation.Apply(gl);
+                System.err.printf
+                  (
+                    "ObjViewer.ObjectViewer: object bounds min (%.2f, %.2f, %.2f) max (%.2f, %.2f, %.2f)\n",
+                    TheObject.BoundMin.x, TheObject.BoundMin.y, TheObject.BoundMin.z,
+                    TheObject.BoundMax.x, TheObject.BoundMax.y, TheObject.BoundMax.z
+                  ); /* debug */
                 final float MaxDim =
                     (float)Math.max
                       (
