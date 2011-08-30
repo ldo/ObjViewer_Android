@@ -5,6 +5,8 @@
   <!-- menu items -->
     <string name="pick_file">Open...</string>
     <string name="reset_view">Reset View</string>
+    <string name="lighting_on">Lighting On</string>
+    <string name="lighting_off">Lighting Off</string>
 
   <!-- prompts -->
     <string name="picker_prompt">Select .obj File</string>
@@ -12,6 +14,6 @@
   <!-- buttons -->
     <string name="open">Open</string>
 
-  <!-- messagesin -->
+  <!-- messages -->
     <string name="obj_load_fail">Error loading file: %s</string>
 </resources>

@@ -61,6 +61,28 @@ public class Main extends android.app.Activity
                   } /*run*/
               } /*Runnable*/
           );
+        OptionsMenu.put
+          (
+            TheMenu.add(R.string.lighting_on),
+            new Runnable()
+              {
+                public void run()
+                  {
+                    TheObjectView.SetUseLighting(true);
+                  } /*run*/
+              } /*Runnable*/
+          );
+        OptionsMenu.put
+          (
+            TheMenu.add(R.string.lighting_off),
+            new Runnable()
+              {
+                public void run()
+                  {
+                    TheObjectView.SetUseLighting(false);
+                  } /*run*/
+              } /*Runnable*/
+          );
         return
             true;
       } /*onCreateOptionsMenu*/
