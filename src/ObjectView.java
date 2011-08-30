@@ -216,13 +216,19 @@ public class ObjectView extends android.opengl.GLSurfaceView
             Handled;
       } /*onTouchEvent*/
 
+    public void ResetOrientation()
+      {
+        CurRotation = new Rotation(0, 0, 0, 1);
+        requestRender();
+      } /*ResetOrientation*/
+
     public void SetObject
       (
         ObjReader.Model NewObject
       )
       {
         TheObject = NewObject;
-        requestRender();
+        ResetOrientation();
       } /*SetObject*/
 
     public void SetUseLighting
