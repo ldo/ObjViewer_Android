@@ -50,6 +50,17 @@ public class Main extends android.app.Activity
                   } /*run*/
               } /*Runnable*/
           );
+        OptionsMenu.put
+          (
+            TheMenu.add(R.string.reset_view),
+            new Runnable()
+              {
+                public void run()
+                  {
+                    TheObjectView.ResetOrientation();
+                  } /*run*/
+              } /*Runnable*/
+          );
         return
             true;
       } /*onCreateOptionsMenu*/
