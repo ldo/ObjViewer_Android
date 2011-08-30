@@ -46,6 +46,23 @@ public class ObjReader
         public final float SpecularExponent;
         public final int Illum; /* NYI for now? */
 
+        private static final float DefaultSpecularExponent = 100.0f /*?*/;
+        private static final int DefaultIllum = 0 /*?*/;
+
+        public Material
+          (
+            String Name
+          )
+          /* material with all default settings. */
+          {
+            this.Name = Name;
+            this.AmbientColor = new GeomBuilder.Color(1.0f, 1.0f, 1.0f, 1.0f);
+            this.DiffuseColor = new GeomBuilder.Color(1.0f, 1.0f, 1.0f, 1.0f);
+            this.SpecularColor = new GeomBuilder.Color(1.0f, 1.0f, 1.0f, 1.0f);
+            this.SpecularExponent = DefaultSpecularExponent;
+            this.Illum = DefaultIllum;
+          } /*Material*/
+
         public Material
           (
             String Name,
@@ -93,8 +110,8 @@ public class ObjReader
                       )
                 :
                     new GeomBuilder.Color(1.0f, 1.0f, 1.0f, Alpha);
-            this.SpecularExponent = SpecularExponent != null ? SpecularExponent : 100.0f /*?*/;
-            this.Illum = Illum != null ? Illum : 0 /*?*/;
+            this.SpecularExponent = SpecularExponent != null ? SpecularExponent : DefaultSpecularExponent;
+            this.Illum = Illum != null ? Illum : DefaultIllum;
           } /*Material*/
 
         public void Apply
@@ -521,7 +538,7 @@ public class ObjReader
         ArrayList<FaceVert[]> Faces = null;
         MaterialSet LoadedMaterials = new MaterialSet();
         final ArrayList<Model.Component> ModelComponents = new ArrayList<Model.Component>();
-        Material CurMaterial = null;
+        Material CurMaterial = new Material("");
         GeomBuilder.Vec3f
             BoundMin = null,
             BoundMax = null;
