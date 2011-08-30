@@ -41,7 +41,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                       (
                         /*light =*/ GL10.GL_LIGHT0,
                         /*pname =*/ GL10.GL_POSITION,
-                        /*params =*/ new float[] {0.0f, 2.0f, -2.0f, 1.0f},
+                        /*params =*/ new float[] {0.0f, 2.0f, 2.0f, 1.0f},
                         /*offset =*/ 0
                       );
                     gl.glLightfv
