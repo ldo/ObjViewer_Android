@@ -1,6 +1,6 @@
 package nz.gen.geek_central.GLUseful;
 /*
-    Quaternion representation of rotation transformations.
+    Quaternion representation of 3D rotation transformations.
 
     Copyright 2011 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
 
