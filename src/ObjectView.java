@@ -267,7 +267,6 @@ public class ObjectView extends android.opengl.GLSurfaceView
                         CurRotation
                       );
                       /* ordering of composing the new rotations doesn't matter because axes are orthogonal */
-                      /* but should previous rotation be post-multiplied rather than pre-multiplied? */
                 LastMouse = ThisMouse;
                 requestRender();
               } /*if*/
