@@ -196,6 +196,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                     Radius,
                     DeltaR,
                     ZAngle,
+                    CurRotation,
                     new Rotation /* X+Y axis */
                       (
                         (float)Math.toDegrees
@@ -214,7 +215,9 @@ public class ObjectView extends android.opengl.GLSurfaceView
                         0
                       ),
                     new Rotation(ZAngle, 0, 0, -1), /* Z axis */
-                    CurRotation,
+                        CurRotation
+                    .mul
+                      (
                         new Rotation /* X+Y axis */
                           (
                             (float)Math.toDegrees
@@ -232,16 +235,16 @@ public class ObjectView extends android.opengl.GLSurfaceView
                             (MidPoint.x - ThisMouse.x) / Radius,
                             0
                           )
-                    .mul
-                      (
-                        new Rotation(ZAngle, 0, 0, -1) /* Z axis */
                       )
                     .mul
                       (
-                        CurRotation
+                        new Rotation(ZAngle, 0, 0, -1) /* Z axis */
                       )
                   ); /* debug */
                 CurRotation =
+                        CurRotation
+                    .mul
+                      (
                         new Rotation /* X+Y axis */
                           (
                             (float)Math.toDegrees
@@ -259,13 +262,10 @@ public class ObjectView extends android.opengl.GLSurfaceView
                             (MidPoint.x - ThisMouse.x) / Radius,
                             0
                           )
-                    .mul
-                      (
-                        new Rotation(ZAngle, 0, 0, -1) /* Z axis */
                       )
                     .mul
                       (
-                        CurRotation
+                        new Rotation(ZAngle, 0, 0, -1) /* Z axis */
                       );
                       /* ordering of composing the new rotations doesn't matter because axes are orthogonal */
                 LastMouse = ThisMouse;
