@@ -207,8 +207,8 @@ public class ObjectView extends android.opengl.GLSurfaceView
                                             axis is equal to radius of view */
                                   )
                               ),
-                            (MidPoint.y - ThisMouse.y) / Radius,
-                            (MidPoint.x - ThisMouse.x) / Radius,
+                            (ThisMouse.y - MidPoint.y) / Radius,
+                            (ThisMouse.x - MidPoint.x) / Radius,
                             0
                           )
                       )
