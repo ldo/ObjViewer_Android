@@ -190,57 +190,6 @@ public class ObjectView extends android.opengl.GLSurfaceView
                                 LastMouse.x - MidPoint.x
                               )
                       );
-                System.err.printf
-                  (
-                    "ObjectView: Radius = %e, DeltaR = %e, ZAngle = %e°, compose rotations: %s × %s × %s => %s\n",
-                    Radius,
-                    DeltaR,
-                    ZAngle,
-                    CurRotation,
-                    new Rotation /* X+Y axis */
-                      (
-                        (float)Math.toDegrees
-                          (
-                            Math.asin
-                              (
-                                    DeltaR
-                                /
-                                    (float)Math.hypot(MidPoint.x, MidPoint.y)
-                                      /* scale rotation angle by assuming depth of
-                                        axis is equal to radius of view */
-                              )
-                          ),
-                        (MidPoint.y - ThisMouse.y) / Radius,
-                        (MidPoint.x - ThisMouse.x) / Radius,
-                        0
-                      ),
-                    new Rotation(ZAngle, 0, 0, -1), /* Z axis */
-                        CurRotation
-                    .mul
-                      (
-                        new Rotation /* X+Y axis */
-                          (
-                            (float)Math.toDegrees
-                              (
-                                Math.asin
-                                  (
-                                        DeltaR
-                                    /
-                                        (float)Math.hypot(MidPoint.x, MidPoint.y)
-                                          /* scale rotation angle by assuming depth of
-                                            axis is equal to radius of view */
-                                  )
-                              ),
-                            (MidPoint.y - ThisMouse.y) / Radius,
-                            (MidPoint.x - ThisMouse.x) / Radius,
-                            0
-                          )
-                      )
-                    .mul
-                      (
-                        new Rotation(ZAngle, 0, 0, -1) /* Z axis */
-                      )
-                  ); /* debug */
                 CurRotation =
                         CurRotation
                     .mul
@@ -267,7 +216,8 @@ public class ObjectView extends android.opengl.GLSurfaceView
                       (
                         new Rotation(ZAngle, 0, 0, -1) /* Z axis */
                       );
-                      /* ordering of composing the new rotations doesn't matter because axes are orthogonal */
+                      /* ordering of composing the new rotations doesn't matter
+                        because axes are orthogonal */
                 LastMouse = ThisMouse;
                 requestRender();
               } /*if*/
