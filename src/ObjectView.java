@@ -64,7 +64,6 @@ public class ObjectView extends android.opengl.GLSurfaceView
                   {
                     gl.glDisable(GL10.GL_LIGHTING);
                   } /*if*/
-                CurRotation.Apply(gl);
                 final float MaxDim =
                     (float)Math.max
                       (
@@ -82,12 +81,14 @@ public class ObjectView extends android.opengl.GLSurfaceView
                     TheObject.BoundMax.x, TheObject.BoundMax.y, TheObject.BoundMax.z,
                     1.0f / MaxDim
                   ); /* debug */
+                gl.glTranslatef(0.0f, 0.0f, -1.2f);
+                CurRotation.Apply(gl);
                 gl.glScalef(1.0f / MaxDim, 1.0f / MaxDim, 1.0f / MaxDim);
                 gl.glTranslatef
                   (
                     - (TheObject.BoundMax.x + TheObject.BoundMin.x) / 2.0f,
                     - (TheObject.BoundMax.y + TheObject.BoundMin.y) / 2.0f,
-                    - TheObject.BoundMax.z * 1.2f
+                    - (TheObject.BoundMax.z + TheObject.BoundMin.z) / 2.0f
                   );
                 gl.glFrontFace
                   (
