@@ -36,13 +36,13 @@ public class ObjectView extends android.opengl.GLSurfaceView
                 if (UseLighting)
                   {
                     gl.glEnable(GL10.GL_LIGHTING);
+                  /* light positions are fixed relative to view */
                     gl.glEnable(GL10.GL_LIGHT0);
-                  /* light position is fixed relative to view */
                     gl.glLightfv
                       (
                         /*light =*/ GL10.GL_LIGHT0,
                         /*pname =*/ GL10.GL_POSITION,
-                        /*params =*/ new float[] {0.0f, 0.0f, 1.0f, 1.0f},
+                        /*params =*/ new float[] {0.0f, 2.0f, 0.0f, 1.0f},
                         /*offset =*/ 0
                       );
                     gl.glLightfv
@@ -64,6 +64,28 @@ public class ObjectView extends android.opengl.GLSurfaceView
                         /*light =*/ GL10.GL_LIGHT0,
                         /*pname =*/ GL10.GL_SPECULAR,
                         /*params =*/ new float[] {0.7f, 0.7f, 0.7f, 1.0f},
+                        /*offset =*/ 0
+                      );
+                    gl.glEnable(GL10.GL_LIGHT1);
+                    gl.glLightfv
+                      (
+                        /*light =*/ GL10.GL_LIGHT1,
+                        /*pname =*/ GL10.GL_POSITION,
+                        /*params =*/ new float[] {0.0f, 0.0f, -2.0f, 1.0f},
+                        /*offset =*/ 0
+                      );
+                    gl.glLightfv
+                      (
+                        /*light =*/ GL10.GL_LIGHT1,
+                        /*pname =*/ GL10.GL_DIFFUSE,
+                        /*params =*/ new float[] {0.3f, 0.3f, 0.3f, 1.0f},
+                        /*offset =*/ 0
+                      );
+                    gl.glLightfv
+                      (
+                        /*light =*/ GL10.GL_LIGHT1,
+                        /*pname =*/ GL10.GL_SPECULAR,
+                        /*params =*/ new float[] {0.3f, 0.3f, 0.3f, 1.0f},
                         /*offset =*/ 0
                       );
                   }
