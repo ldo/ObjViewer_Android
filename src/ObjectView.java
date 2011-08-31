@@ -42,7 +42,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                       (
                         /*light =*/ GL10.GL_LIGHT0,
                         /*pname =*/ GL10.GL_POSITION,
-                        /*params =*/ new float[] {0.0f, 2.0f, 2.0f, 1.0f},
+                        /*params =*/ new float[] {0.0f, 0.0f, 1.0f, 1.0f},
                         /*offset =*/ 0
                       );
                     gl.glLightfv
@@ -50,6 +50,13 @@ public class ObjectView extends android.opengl.GLSurfaceView
                         /*light =*/ GL10.GL_LIGHT0,
                         /*pname =*/ GL10.GL_AMBIENT,
                         /*params =*/ new float[] {0.4f, 0.4f, 0.4f, 1.0f},
+                        /*offset =*/ 0
+                      );
+                    gl.glLightfv
+                      (
+                        /*light =*/ GL10.GL_LIGHT0,
+                        /*pname =*/ GL10.GL_DIFFUSE,
+                        /*params =*/ new float[] {0.7f, 0.7f, 0.7f, 1.0f},
                         /*offset =*/ 0
                       );
                     gl.glLightfv
@@ -81,9 +88,9 @@ public class ObjectView extends android.opengl.GLSurfaceView
                     TheObject.BoundMax.x, TheObject.BoundMax.y, TheObject.BoundMax.z,
                     1.0f / MaxDim
                   ); /* debug */
-                gl.glTranslatef(0.0f, 0.0f, -1.2f);
+                gl.glTranslatef(0.0f, 0.0f, -2.5f);
                 CurRotation.Apply(gl);
-                gl.glScalef(1.0f / MaxDim, 1.0f / MaxDim, 1.0f / MaxDim);
+                gl.glScalef(2.0f / MaxDim, 2.0f / MaxDim, 2.0f / MaxDim);
                 gl.glTranslatef
                   (
                     - (TheObject.BoundMax.x + TheObject.BoundMin.x) / 2.0f,
@@ -113,10 +120,10 @@ public class ObjectView extends android.opengl.GLSurfaceView
             gl.glLoadIdentity();
             gl.glFrustumf
               (
-                /*l =*/ - (float)ViewWidth / ViewHeight,
-                /*r =*/ (float)ViewWidth / ViewHeight,
-                /*b =*/ -1.0f,
-                /*t =*/ 1.0f,
+                /*l =*/ ViewWidth > ViewHeight ? - 1.0f : - (float)ViewWidth / ViewHeight,
+                /*r =*/ ViewWidth > ViewHeight ? 1.0f : (float)ViewWidth / ViewHeight,
+                /*b =*/ ViewWidth < ViewHeight ? -1.0f : - (float)ViewHeight / ViewWidth,
+                /*t =*/ ViewWidth < ViewHeight ? 1.0f : (float)ViewHeight / ViewWidth,
                 /*n =*/ 1.0f,
                 /*f =*/ 10.0f
               );
