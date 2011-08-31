@@ -92,7 +92,26 @@ public class Rotation
       {
         final float Mag = android.util.FloatMath.sqrt(x * x + y * y + z * z);
           /* in case of accumulated rounding errors */
-        gl.glRotatef((float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag);
+        if (Mag != 0.0f)
+          {
+            gl.glRotatef((float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag);
+          } /*if*/
+        System.err.printf
+          (
+            "Rotation.Apply: %s => %.2f° about (%e, %e, %e)\n",
+            this.toString(),
+            (float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag
+          ); /* debug */
       } /*Apply*/
+
+    public String toString()
+      {
+        return
+            String.format
+              (
+                "Rotation(%e, %e, %e, %e)",
+                c, x, y, z
+              );
+      } /*toString*/
 
   } /*Rotation*/

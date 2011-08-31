@@ -65,12 +65,6 @@ public class ObjectView extends android.opengl.GLSurfaceView
                     gl.glDisable(GL10.GL_LIGHTING);
                   } /*if*/
                 CurRotation.Apply(gl);
-                System.err.printf
-                  (
-                    "ObjViewer.ObjectViewer: object bounds min (%.2f, %.2f, %.2f) max (%.2f, %.2f, %.2f)\n",
-                    TheObject.BoundMin.x, TheObject.BoundMin.y, TheObject.BoundMin.z,
-                    TheObject.BoundMax.x, TheObject.BoundMax.y, TheObject.BoundMax.z
-                  ); /* debug */
                 final float MaxDim =
                     (float)Math.max
                       (
@@ -81,6 +75,13 @@ public class ObjectView extends android.opengl.GLSurfaceView
                           ),
                         TheObject.BoundMax.z - TheObject.BoundMin.z
                       );
+                System.err.printf
+                  (
+                    "ObjViewer.ObjectViewer: object bounds min (%.2f, %.2f, %.2f) max (%.2f, %.2f, %.2f), scale by %e\n",
+                    TheObject.BoundMin.x, TheObject.BoundMin.y, TheObject.BoundMin.z,
+                    TheObject.BoundMax.x, TheObject.BoundMax.y, TheObject.BoundMax.z,
+                    1.0f / MaxDim
+                  ); /* debug */
                 gl.glScalef(1.0f / MaxDim, 1.0f / MaxDim, 1.0f / MaxDim);
                 gl.glTranslatef
                   (
@@ -188,10 +189,31 @@ public class ObjectView extends android.opengl.GLSurfaceView
                                 LastMouse.x - MidPoint.x
                               )
                       );
-                CurRotation =
-                        CurRotation
-                    .mul
+                System.err.printf
+                  (
+                    "ObjectView: Radius = %e, DeltaR = %e, ZAngle = %e°, compose rotations: %s × %s × %s => %s\n",
+                    Radius,
+                    DeltaR,
+                    ZAngle,
+                    new Rotation /* X+Y axis */
                       (
+                        (float)Math.toDegrees
+                          (
+                            Math.asin
+                              (
+                                    DeltaR
+                                /
+                                    (float)Math.hypot(MidPoint.x, MidPoint.y)
+                                      /* scale rotation angle by assuming depth of
+                                        axis is equal to radius of view */
+                              )
+                          ),
+                        (MidPoint.y - ThisMouse.y) / Radius,
+                        (MidPoint.x - ThisMouse.x) / Radius,
+                        0
+                      ),
+                    new Rotation(ZAngle, 0, 0, 1), /* Z axis */
+                    CurRotation,
                         new Rotation /* X+Y axis */
                           (
                             (float)Math.toDegrees
@@ -205,14 +227,47 @@ public class ObjectView extends android.opengl.GLSurfaceView
                                             axis is equal to radius of view */
                                   )
                               ),
-                            - (ThisMouse.y - MidPoint.y) / DeltaR,
-                            (ThisMouse.x - MidPoint.x) / DeltaR,
+                            (MidPoint.y - ThisMouse.y) / Radius,
+                            (MidPoint.x - ThisMouse.x) / Radius,
                             0
                           )
-                      )
                     .mul
                       (
                         new Rotation(ZAngle, 0, 0, 1) /* Z axis */
+                      )
+                    .mul
+                      (
+                        CurRotation
+                      )
+                  ); /* debug */
+                CurRotation =
+                        new Rotation /* X+Y axis */
+                          (
+                            (float)Math.toDegrees
+                              (
+                                Math.asin
+                                  (
+                                        DeltaR
+                                    /
+                                        (float)Math.hypot(MidPoint.x, MidPoint.y)
+                                          /* scale rotation angle by assuming depth of
+                                            axis is equal to radius of view */
+                                  )
+                              ),
+                            (MidPoint.y - ThisMouse.y) / Radius,
+                            (MidPoint.x - ThisMouse.x) / Radius,
+                            0
+                          )
+                    .mul
+                      (
+                        false ? /* debug */
+                            new Rotation(ZAngle, 0, 0, 1) /* Z axis */
+                        :
+                            new Rotation(0, 0, 0, 1) /* debug */
+                      )
+                    .mul
+                      (
+                        CurRotation
                       );
                       /* ordering of composing the new rotations doesn't matter because axes are orthogonal */
                       /* but should previous rotation be post-multiplied rather than pre-multiplied? */
