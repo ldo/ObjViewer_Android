@@ -191,9 +191,6 @@ public class ObjectView extends android.opengl.GLSurfaceView
                               )
                       );
                 CurRotation =
-                        CurRotation
-                    .mul
-                      (
                         new Rotation /* X+Y axis */
                           (
                             (float)Math.toDegrees
@@ -211,10 +208,13 @@ public class ObjectView extends android.opengl.GLSurfaceView
                             (ThisMouse.x - MidPoint.x) / Radius,
                             0
                           )
-                      )
                     .mul
                       (
                         new Rotation(ZAngle, 0, 0, -1) /* Z axis */
+                      )
+                    .mul
+                      (
+                        CurRotation
                       );
                       /* ordering of composing the new rotations doesn't matter
                         because axes are orthogonal */
