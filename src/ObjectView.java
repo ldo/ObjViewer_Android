@@ -212,7 +212,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                         (MidPoint.x - ThisMouse.x) / Radius,
                         0
                       ),
-                    new Rotation(ZAngle, 0, 0, 1), /* Z axis */
+                    new Rotation(ZAngle, 0, 0, -1), /* Z axis */
                     CurRotation,
                         new Rotation /* X+Y axis */
                           (
@@ -233,7 +233,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                           )
                     .mul
                       (
-                        new Rotation(ZAngle, 0, 0, 1) /* Z axis */
+                        new Rotation(ZAngle, 0, 0, -1) /* Z axis */
                       )
                     .mul
                       (
@@ -260,10 +260,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                           )
                     .mul
                       (
-                        false ? /* debug */
-                            new Rotation(ZAngle, 0, 0, 1) /* Z axis */
-                        :
-                            new Rotation(0, 0, 0, 1) /* debug */
+                        new Rotation(ZAngle, 0, 0, -1) /* Z axis */
                       )
                     .mul
                       (
