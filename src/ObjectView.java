@@ -1,6 +1,7 @@
 package nz.gen.geek_central.ObjViewer;
 /*
-    3D view widget
+    3D view widget. Lets the user apply interactive rotation of the
+    object around any axis. Also does rotation animations.
 
     Copyright 2011 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
 
@@ -276,20 +277,23 @@ public class ObjectView extends android.opengl.GLSurfaceView
                             (float)Math.hypot(LastMouse.x - MidPoint.x, LastMouse.y - MidPoint.y);
                       /* radial movement, for rotation about X and Y axes */
                     final float ZAngle =
-                        (float)Math.toDegrees
-                          (
-                                Math.atan2
-                                  (
-                                    ThisMouse.y - MidPoint.y,
-                                    ThisMouse.x - MidPoint.x
-                                  )
-                            -
-                                Math.atan2
-                                  (
-                                    LastMouse.y - MidPoint.y,
-                                    LastMouse.x - MidPoint.x
-                                  )
-                          );
+                        Radius / (float)Math.hypot(MidPoint.x, MidPoint.y) >= 0.5 ?
+                            (float)Math.toDegrees
+                              (
+                                    Math.atan2
+                                      (
+                                        ThisMouse.y - MidPoint.y,
+                                        ThisMouse.x - MidPoint.x
+                                      )
+                                -
+                                    Math.atan2
+                                      (
+                                        LastMouse.y - MidPoint.y,
+                                        LastMouse.x - MidPoint.x
+                                      )
+                              )
+                        : /* disable Z-rotation too close to centre where it’s too hard to control */
+                            0.0f;
                     CurRotation =
                             new Rotation /* X+Y axis */
                               (
