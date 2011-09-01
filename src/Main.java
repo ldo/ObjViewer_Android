@@ -176,7 +176,7 @@ public class Main extends android.app.Activity
               {
                 public void run()
                   {
-                    TheObjectView.ResetOrientation();
+                    TheObjectView.ResetOrientation(true);
                   } /*run*/
               } /*Runnable*/
           );

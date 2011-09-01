@@ -31,7 +31,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
     private Rotation CurRotation = new Rotation(0, 0, 0, 1);
     private PointF LastMouse = null;
 
-    class ObjectViewRenderer implements Renderer
+    private class ObjectViewRenderer implements Renderer
       {
 
         public ObjectViewRenderer()
@@ -193,6 +193,58 @@ public class ObjectView extends android.opengl.GLSurfaceView
         setRenderMode(RENDERMODE_WHEN_DIRTY);
       } /*ObjectView*/
 
+    private class RotationAnimator implements Runnable
+      {
+        final android.view.animation.Interpolator AnimFunction;
+        final double StartTime, EndTime;
+        final Rotation StartRotation, DeltaRotation;
+
+        public RotationAnimator
+          (
+            android.view.animation.Interpolator AnimFunction,
+            double StartTime,
+            double EndTime,
+            Rotation StartRotation,
+            Rotation EndRotation
+          )
+          {
+            this.AnimFunction = AnimFunction;
+            this.StartTime = StartTime;
+            this.EndTime = EndTime;
+            this.StartRotation = StartRotation;
+            this.DeltaRotation = EndRotation.mul(StartRotation.inv());
+            CurrentAnim = this;
+            getHandler().post(this);
+          } /*RotationAnimator*/
+
+        public void run()
+          {
+            final double CurrentTime = System.currentTimeMillis() / 1000.0;
+            final float AnimAmt =
+                AnimFunction.getInterpolation((float)((CurrentTime - StartTime) / (EndTime - StartTime)));
+            CurRotation = DeltaRotation.mul(AnimAmt).mul(StartRotation);
+            System.err.printf
+              (
+                "ObjectView anim at time %.3f => %.3f %s\n",
+                (CurrentTime - StartTime) / (EndTime - StartTime),
+                AnimAmt,
+                CurRotation
+              ); /* debug */
+            requestRender();
+            if (CurrentTime < EndTime)
+              {
+                getHandler().post(this);
+              }
+            else
+              {
+                CurrentAnim = null;
+              } /*if*/
+          } /*run*/
+
+      } /*RotationAnimator*/
+
+    private RotationAnimator CurrentAnim = null;
+
   /* save/restore instance state? */
 
     @Override
@@ -202,86 +254,104 @@ public class ObjectView extends android.opengl.GLSurfaceView
       )
       {
         boolean Handled = false;
-       /* fling gestures? */
-        switch (TheEvent.getAction())
+        if (CurrentAnim == null)
           {
-        case MotionEvent.ACTION_DOWN:
-            LastMouse = new PointF(TheEvent.getX(), TheEvent.getY());
-            Handled = true;
-        break;
-        case MotionEvent.ACTION_MOVE:
-            if (LastMouse != null && TheObject != null)
+           /* fling gestures? */
+            switch (TheEvent.getAction())
               {
-                final PointF ThisMouse = new PointF(TheEvent.getX(), TheEvent.getY());
-                final PointF MidPoint = new PointF(getWidth() / 2.0f, getHeight() / 2.0f);
-                final float Radius =
-                    (float)Math.hypot(ThisMouse.x - MidPoint.x, ThisMouse.y - MidPoint.y);
-                final float DeltaR =
-                        Radius
-                    -
-                        (float)Math.hypot(LastMouse.x - MidPoint.x, LastMouse.y - MidPoint.y);
-                  /* radial movement, for rotation about X and Y axes */
-                final float ZAngle =
-                    (float)Math.toDegrees
-                      (
-                            Math.atan2
-                              (
-                                ThisMouse.y - MidPoint.y,
-                                ThisMouse.x - MidPoint.x
-                              )
+            case MotionEvent.ACTION_DOWN:
+                LastMouse = new PointF(TheEvent.getX(), TheEvent.getY());
+                Handled = true;
+            break;
+            case MotionEvent.ACTION_MOVE:
+                if (LastMouse != null && TheObject != null)
+                  {
+                    final PointF ThisMouse = new PointF(TheEvent.getX(), TheEvent.getY());
+                    final PointF MidPoint = new PointF(getWidth() / 2.0f, getHeight() / 2.0f);
+                    final float Radius =
+                        (float)Math.hypot(ThisMouse.x - MidPoint.x, ThisMouse.y - MidPoint.y);
+                    final float DeltaR =
+                            Radius
                         -
-                            Math.atan2
-                              (
-                                LastMouse.y - MidPoint.y,
-                                LastMouse.x - MidPoint.x
-                              )
-                      );
-                CurRotation =
-                        new Rotation /* X+Y axis */
+                            (float)Math.hypot(LastMouse.x - MidPoint.x, LastMouse.y - MidPoint.y);
+                      /* radial movement, for rotation about X and Y axes */
+                    final float ZAngle =
+                        (float)Math.toDegrees
                           (
-                            (float)Math.toDegrees
-                              (
-                                Math.asin
+                                Math.atan2
                                   (
-                                        DeltaR
-                                    /
-                                        (float)Math.hypot(MidPoint.x, MidPoint.y)
-                                          /* scale rotation angle by assuming depth of
-                                            axis is equal to radius of view */
+                                    ThisMouse.y - MidPoint.y,
+                                    ThisMouse.x - MidPoint.x
                                   )
-                              ),
-                            (ThisMouse.y - MidPoint.y) / Radius,
-                            (ThisMouse.x - MidPoint.x) / Radius,
-                            0
+                            -
+                                Math.atan2
+                                  (
+                                    LastMouse.y - MidPoint.y,
+                                    LastMouse.x - MidPoint.x
+                                  )
+                          );
+                    CurRotation =
+                            new Rotation /* X+Y axis */
+                              (
+                                (float)Math.toDegrees
+                                  (
+                                    Math.asin
+                                      (
+                                            DeltaR
+                                        /
+                                            (float)Math.hypot(MidPoint.x, MidPoint.y)
+                                              /* scale rotation angle by assuming depth of
+                                                axis is equal to radius of view */
+                                      )
+                                  ),
+                                (ThisMouse.y - MidPoint.y) / Radius,
+                                (ThisMouse.x - MidPoint.x) / Radius,
+                                0
+                              )
+                        .mul
+                          (
+                            new Rotation(ZAngle, 0, 0, -1) /* Z axis */
                           )
-                    .mul
-                      (
-                        new Rotation(ZAngle, 0, 0, -1) /* Z axis */
-                      )
-                    .mul
-                      (
-                        CurRotation
-                      );
-                      /* ordering of composing the new rotations doesn't matter
-                        because axes are orthogonal */
-                LastMouse = ThisMouse;
-                requestRender();
-              } /*if*/
-            Handled = true;
-        break;
-        case MotionEvent.ACTION_UP:
-            LastMouse = null;
-            Handled = true;
-        break;
-          } /*switch*/
+                        .mul
+                          (
+                            CurRotation
+                          );
+                          /* ordering of composing the new rotations doesn't matter
+                            because axes are orthogonal */
+                    LastMouse = ThisMouse;
+                    requestRender();
+                  } /*if*/
+                Handled = true;
+            break;
+            case MotionEvent.ACTION_UP:
+                LastMouse = null;
+                Handled = true;
+            break;
+              } /*switch*/
+          } /*if*/
         return
             Handled;
       } /*onTouchEvent*/
 
-    public void ResetOrientation()
+    public void ResetOrientation
+      (
+        boolean Animate
+      )
       {
-        CurRotation = new Rotation(0, 0, 0, 1);
-        requestRender();
+        if (Animate)
+          {
+            SetOrientation
+              (
+                /*NewOrientation =*/ new Rotation(0, 0, 0, 1),
+                /*AnimFunction =*/ new android.view.animation.AccelerateDecelerateInterpolator(),
+                /*AnimDuration =*/ 5.0f /* large value for testing */
+              );
+          }
+        else
+          {
+            CurRotation = new Rotation(0, 0, 0, 1);
+            requestRender();
+          } /*if*/
       } /*ResetOrientation*/
 
     public void SetObject
@@ -290,7 +360,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
       )
       {
         TheObject = NewObject;
-        ResetOrientation();
+        ResetOrientation(false);
       } /*SetObject*/
 
     public void SetUseLighting
@@ -322,5 +392,23 @@ public class ObjectView extends android.opengl.GLSurfaceView
         return
             ClockwiseFaces;
       } /*GetClockwiseFaces*/
+
+    public void SetOrientation
+      (
+        Rotation NewOrientation,
+        android.view.animation.Interpolator AnimFunction, /* optional */
+        float AnimDuration /* ignored unless AnimFunction is specified */
+      )
+      {
+        final double CurrentTime = System.currentTimeMillis() / 1000.0;
+        new RotationAnimator
+          (
+            /*AnimFunction =*/ AnimFunction,
+            /*StartTime =*/ CurrentTime,
+            /*EndTime =*/ CurrentTime + AnimDuration,
+            /*StartRotation =*/ CurRotation,
+            /*EndRotation =*/ NewOrientation
+          );
+      } /*SetOrientation*/
 
   } /*ObjectView*/

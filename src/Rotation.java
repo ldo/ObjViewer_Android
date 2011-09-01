@@ -59,13 +59,13 @@ public class Rotation
         this.z = z;
       } /*Rotation*/
 
-    public Rotation neg()
+    public Rotation inv()
       /* returns rotation by the opposite angle around the same axis. Or alternatively,
         the same angle around the opposite-pointing axis . */
       {
         return
             new Rotation(c, -x, -y, -z, null);
-      } /*neg*/
+      } /*inv*/
 
     public Rotation mul
       (
@@ -84,6 +84,20 @@ public class Rotation
               );
       } /*mul*/
 
+    public Rotation mul
+      (
+        float Frac
+      )
+      /* returns the specified fraction of the rotation. */
+      {
+        final float Mag = android.util.FloatMath.sqrt(x * x + y * y + z * z);
+        return
+            Mag != 0.0f ?
+                new Rotation((float)Math.toDegrees(2 * Math.atan2(Mag, c) * Frac), x / Mag, y / Mag, z / Mag)
+            :
+                new Rotation(0, 0, 0, 1);
+      } /*mul*/
+
     public void Apply
       (
         GL10 gl
@@ -91,7 +105,6 @@ public class Rotation
       /* applies the rotation to the currently-selected GL matrix. */
       {
         final float Mag = android.util.FloatMath.sqrt(x * x + y * y + z * z);
-          /* in case of accumulated rounding errors */
         if (Mag != 0.0f)
           {
             gl.glRotatef((float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag);
