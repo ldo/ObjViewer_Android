@@ -25,6 +25,28 @@ public class Main extends android.app.Activity
 
     ObjectView TheObjectView;
 
+    final java.security.SecureRandom Random = new java.security.SecureRandom();
+      /* why use anything less */
+
+    float Rand()
+      /* returns a random float in [0.0 .. 1.0). */
+      {
+        final byte[] V = new byte[4];
+        Random.nextBytes(V);
+        return
+                (float)(
+                    ((int)V[0] & 255)
+                |
+                    ((int)V[1] & 255) << 8
+                |
+                    ((int)V[2] & 255) << 16
+                |
+                    ((int)V[3] & 255) << 24
+                )
+            /
+                4294967296.0f;
+      } /*Rand*/
+
   /* request codes, all arbitrarily assigned */
     static final int LoadObjectRequest = 1;
 
@@ -237,6 +259,27 @@ public class Main extends android.app.Activity
                         .AddButton(getString(R.string.anticlockwise), 0)
                         .AddButton(getString(R.string.clockwise), 1)
                         .show();
+                  } /*run*/
+              } /*Runnable*/
+          );
+        OptionsMenu.put
+          (
+            TheMenu.add(R.string.random_view),
+            new Runnable()
+              {
+                public void run()
+                  {
+                    final float
+                        X = Rand(),
+                        Y = Rand(),
+                        Z = Rand(),
+                        R = (float)android.util.FloatMath.sqrt(X * X + Y * Y + Z * Z),
+                        Angle = Rand() * 360.0f;
+                    TheObjectView.SetOrientation
+                      (
+                        new nz.gen.geek_central.GLUseful.Rotation(Angle, X / R, Y / R, Z / R),
+                        true
+                      );
                   } /*run*/
               } /*Runnable*/
           );

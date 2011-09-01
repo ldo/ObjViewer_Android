@@ -338,20 +338,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
         boolean Animate
       )
       {
-        if (Animate)
-          {
-            SetOrientation
-              (
-                /*NewOrientation =*/ Rotation.Null,
-                /*AnimFunction =*/ new android.view.animation.AccelerateDecelerateInterpolator(),
-                /*AnimDuration =*/ 1.5f
-              );
-          }
-        else
-          {
-            CurRotation = Rotation.Null;
-            requestRender();
-          } /*if*/
+        SetOrientation(Rotation.Null, Animate);
       } /*ResetOrientation*/
 
     public void SetObject
@@ -400,14 +387,40 @@ public class ObjectView extends android.opengl.GLSurfaceView
         float AnimDuration /* ignored unless AnimFunction is specified */
       )
       {
-        final double CurrentTime = System.currentTimeMillis() / 1000.0;
-        new RotationAnimator
+        if (AnimFunction != null)
+          {
+            final double CurrentTime = System.currentTimeMillis() / 1000.0;
+            new RotationAnimator
+              (
+                /*AnimFunction =*/ AnimFunction,
+                /*StartTime =*/ CurrentTime,
+                /*EndTime =*/ CurrentTime + AnimDuration,
+                /*StartRotation =*/ CurRotation,
+                /*EndRotation =*/ NewOrientation
+              );
+          }
+        else
+          {
+            CurRotation = NewOrientation;
+            requestRender();
+          } /*if*/
+      } /*SetOrientation*/
+
+    public void SetOrientation
+      (
+        Rotation NewOrientation,
+        boolean Animate
+      )
+      {
+        SetOrientation
           (
-            /*AnimFunction =*/ AnimFunction,
-            /*StartTime =*/ CurrentTime,
-            /*EndTime =*/ CurrentTime + AnimDuration,
-            /*StartRotation =*/ CurRotation,
-            /*EndRotation =*/ NewOrientation
+            /*NewOrientation =*/ NewOrientation,
+            /*AnimFunction =*/
+                Animate ?
+                    new android.view.animation.AccelerateDecelerateInterpolator()
+                :
+                    null,
+            /*AnimDuration =*/ 1.5f
           );
       } /*SetOrientation*/
 

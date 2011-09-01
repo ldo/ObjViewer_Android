@@ -5,6 +5,7 @@
   <!-- menu items -->
     <string name="pick_file">Open...</string>
     <string name="reset_view">Reset View</string>
+    <string name="random_view">Random View</string>
     <string name="options_lighting">Lighting...</string>
     <string name="options_orient_faces">Orient Faces...</string>
 
