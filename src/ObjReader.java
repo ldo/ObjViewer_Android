@@ -263,16 +263,18 @@ public class ObjReader
               {
                 Fail("read past EOF");
               } /*if*/
-            ++ColNr;
             /*final*/ char Result
                 = (char)-1; /*sigh*/
             try
               {
+                boolean LastWasBackslash = false;
                 for (;;)
                   {
+                    ++ColNr;
                     final int ich = Input.read();
                     if (ich < 0)
                       {
+                        --ColNr;
                         EOF = true;
                         Result = '\n';
                         break;
@@ -280,12 +282,26 @@ public class ObjReader
                     else if (LastWasCR && (char)ich == '\012')
                       {
                       /* skip LF following CR */
+                        --ColNr;
+                        LastWasCR = false;
+                        LastWasBackslash = false;
+                      }
+                    else if (!LastWasBackslash && (char)ich == '\\')
+                      {
+                        LastWasBackslash = true;
                         LastWasCR = false;
                       }
-                    else
+                    else if (!LastWasBackslash || !IsEOL((char)ich))
                       {
                         Result = (char)ich;
                         break;
+                      }
+                    else
+                      {
+                        ++LineNr;
+                        ColNr = 0;
+                        LastWasCR = (char)ich == '\015';
+                        LastWasBackslash = false;
                       } /*if*/
                   } /*for*/
               }
@@ -383,20 +399,33 @@ public class ObjReader
                 Result;
           } /*GetFloat*/
 
-        public GeomBuilder.Vec3f GetVec()
+        public GeomBuilder.Vec3f GetVec
+          (
+            boolean AllowHomog
+          )
           {
             final String XStr = NextSym(true);
             final String YStr = NextSym(true);
             final String ZStr = NextSym(true);
+            final String WStr =
+                AllowHomog ?
+                    NextSym(false)
+                :
+                    null;
             /*final*/ GeomBuilder.Vec3f Result
                 = null; /*sigh*/
             try
               {
+                final float W =
+                    WStr != null ?
+                        Float.parseFloat(WStr)
+                    :
+                        1.0f;
                 Result = new GeomBuilder.Vec3f
                   (
-                    Float.parseFloat(XStr),
-                    Float.parseFloat(YStr),
-                    Float.parseFloat(ZStr)
+                    Float.parseFloat(XStr) / W,
+                    Float.parseFloat(YStr) / W,
+                    Float.parseFloat(ZStr) / W
                   );
               }
             catch (NumberFormatException BadNum)
@@ -594,15 +623,7 @@ public class ObjReader
                           {
                             FaceVerts[i] = FaceMap.get(Face[i]);
                           } /*for*/
-                        switch (FaceVerts.length)
-                          {
-                        case 3:
-                            Geom.AddTri(FaceVerts[0], FaceVerts[1], FaceVerts[2]);
-                        break;
-                        case 4:
-                            Geom.AddQuad(FaceVerts[0], FaceVerts[1], FaceVerts[2], FaceVerts[3]);
-                        break;
-                          } /*switch*/
+                        Geom.AddPoly(FaceVerts);
                       } /*for*/
                     final GeomBuilder.Obj NewObj = Geom.MakeObj();
                     if (BoundMin != null)
@@ -648,7 +669,7 @@ public class ObjReader
               {
                 if (Op == "v")
                   {
-                    final GeomBuilder.Vec3f Vec = Parse.GetVec();
+                    final GeomBuilder.Vec3f Vec = Parse.GetVec(true);
                     if (Vertices == null)
                       {
                         Vertices = new ArrayList<GeomBuilder.Vec3f>();
@@ -657,7 +678,7 @@ public class ObjReader
                   }
                 else if (Op == "vt")
                   {
-                    final GeomBuilder.Vec3f Vec = Parse.GetVec();
+                    final GeomBuilder.Vec3f Vec = Parse.GetVec(false);
                     if (TexCoords == null)
                       {
                         TexCoords = new ArrayList<GeomBuilder.Vec3f>();
@@ -666,7 +687,7 @@ public class ObjReader
                   }
                 else if (Op == "vn")
                   {
-                    final GeomBuilder.Vec3f Vec = Parse.GetVec();
+                    final GeomBuilder.Vec3f Vec = Parse.GetVec(false);
                     if (Normals == null)
                       {
                         Normals = new ArrayList<GeomBuilder.Vec3f>();
@@ -711,7 +732,7 @@ public class ObjReader
                                   }
                                 catch (NumberFormatException BadNum)
                                   {
-                                    Parse.Fail("bad vertex index");
+                                    Parse.Fail(String.format("bad vertex index \"%s\"", VertStr.substring(LastPos, ThisPos)));
                                   } /*try*/
                                 switch (Which)
                                   {
@@ -797,10 +818,6 @@ public class ObjReader
                           } /*if*/
                         FaceVerts.add(new FaceVert(VertIndex, TexCoordIndex, NormalIndex));
                       } /*for*/
-                    if (FaceVerts.size() < 3 || FaceVerts.size() > 4)
-                      {
-                        Parse.Fail("face must have 3 or 4 vertices");
-                      } /*if*/
                     Faces.add(FaceVerts.toArray(new FaceVert[FaceVerts.size()]));
                   }
                 else if (Op == "mtllib")

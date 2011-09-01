@@ -196,6 +196,19 @@ public class GeomBuilder
         AddTri(V4, V1, V3);
       } /*AddQuad*/
 
+    public void AddPoly
+      (
+        int[] V
+      )
+      /* Defines a polygonal face. Array elements are indices as previously
+        returned from calls to Add. */
+      {
+        for (int i = 1; i < V.length - 1; ++i)
+          {
+            AddTri(V[0], V[i], V[i + 1]);
+          } /*for*/
+      } /*AddPoly*/
+
     public static class Obj
       /* representation of complete object geometry. */
       {
