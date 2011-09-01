@@ -28,7 +28,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
     private ObjReader.Model TheObject = null;
     private boolean UseLighting = false;
     private boolean ClockwiseFaces = false;
-    private Rotation CurRotation = new Rotation(0, 0, 0, 1);
+    private Rotation CurRotation = Rotation.Null;
     private PointF LastMouse = null;
 
     private class ObjectViewRenderer implements Renderer
@@ -342,14 +342,14 @@ public class ObjectView extends android.opengl.GLSurfaceView
           {
             SetOrientation
               (
-                /*NewOrientation =*/ new Rotation(0, 0, 0, 1),
+                /*NewOrientation =*/ Rotation.Null,
                 /*AnimFunction =*/ new android.view.animation.AccelerateDecelerateInterpolator(),
                 /*AnimDuration =*/ 1.5f
               );
           }
         else
           {
-            CurRotation = new Rotation(0, 0, 0, 1);
+            CurRotation = Rotation.Null;
             requestRender();
           } /*if*/
       } /*ResetOrientation*/

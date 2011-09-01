@@ -42,6 +42,9 @@ public class Rotation
         z = Sin * Z / Mag;
       } /*Rotation*/
 
+    public static final Rotation Null = new Rotation(0, 0, 0, 1);
+      /* represents no rotation at all */
+
     private Rotation
       (
         float c,
