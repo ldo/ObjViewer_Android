@@ -1,0 +1,44 @@
+ObjViewer is a sample Android application illustrating various aspects
+of using OpenGL-ES 3D graphics:
+  * GeomBuilder: basic management of 3D object geometry and rendering
+  * ObjReader: simple reading of common .obj-format model files and
+    associated .mtl material-definition files
+  * Rotation: generation of 3D rotation transformations using unit
+    quaternions
+  * ObjectView: basic on-screen display of a 3D model with simple
+    lighting, allowing interactive rotation to any orientation, and
+    also demonstrating animated rotations
+
+Copy the .obj file that you want to view (and associated .mtl file, if
+any) onto a directory named “Models” on the SD card of the Android
+device. It should then appear in the list that is shown when you
+select “Open...” from the options menu in ObjViewer.
+
+If parts of the surface of the object seem to disappear, try switching
+the order of vertices in a forward-looking face under “Orient Faces...”.
+
+“Reset View” animates rotating the object back to its initial orientation.
+“Random View” animates rotating the object to a random orientation.
+
+If you want to find downloadable models to view, here are a couple of
+lists of likely websites:
+<http://en.wikibooks.org/wiki/Blender_3D:_Noob_to_Pro/Sources_of_free_3D_models>
+<http://wiki.blender.org/index.php/Doc:Tutorials/Resources/Models>.
+
+If you want to create your own models, Blender <http://www.blender.org/>
+is an amazing package, well worth at least getting a basic understanding
+of how to create simple models and scenes with it. But don’t try to learn it
+on your own; you’ll find plenty of tutorials to get you started--just
+follow the links from the Blender site.
+
+Contents:
+    src/ -- Java sources for the Android app
+    res/ -- resources for the Android app
+    AndroidManifest.xml, build.xml, *.properties -- for driving
+        Google's Android build tools (note that you will have to
+        provide a couple more of these--see INSTALL for details)
+    README -- this file
+    INSTALL -- build/installation instructions
+    LICENSE -- licence (Apache 2.0, same as Google’s sample code)
+
+Lawrence D'Oliveiro <ldo@geek-central.gen.nz>
