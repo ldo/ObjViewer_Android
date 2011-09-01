@@ -401,21 +401,32 @@ public class ObjReader
 
         public GeomBuilder.Vec3f GetVec
           (
-            boolean AllowHomog
+            int MinD, /* [1 .. 3] */
+            int MaxD /* [3 .. 4] */
           )
           {
             final String XStr = NextSym(true);
-            final String YStr = NextSym(true);
-            final String ZStr = NextSym(true);
+            final String YStr = NextSym(MinD >= 2);
+            final String ZStr = NextSym(MinD >= 3);
             final String WStr =
-                AllowHomog ?
-                    NextSym(false)
+                MaxD == 4 ?
+                    NextSym(MinD == 4)
                 :
                     null;
             /*final*/ GeomBuilder.Vec3f Result
                 = null; /*sigh*/
             try
               {
+                final float Y =
+                    YStr != null ?
+                        Float.parseFloat(YStr)
+                    :
+                        1.0f;
+                final float Z =
+                    ZStr != null ?
+                        Float.parseFloat(ZStr)
+                    :
+                        1.0f;
                 final float W =
                     WStr != null ?
                         Float.parseFloat(WStr)
@@ -424,8 +435,8 @@ public class ObjReader
                 Result = new GeomBuilder.Vec3f
                   (
                     Float.parseFloat(XStr) / W,
-                    Float.parseFloat(YStr) / W,
-                    Float.parseFloat(ZStr) / W
+                    Y / W,
+                    Z / W
                   );
               }
             catch (NumberFormatException BadNum)
@@ -669,7 +680,7 @@ public class ObjReader
               {
                 if (Op == "v")
                   {
-                    final GeomBuilder.Vec3f Vec = Parse.GetVec(true);
+                    final GeomBuilder.Vec3f Vec = Parse.GetVec(3, 4);
                     if (Vertices == null)
                       {
                         Vertices = new ArrayList<GeomBuilder.Vec3f>();
@@ -678,7 +689,7 @@ public class ObjReader
                   }
                 else if (Op == "vt")
                   {
-                    final GeomBuilder.Vec3f Vec = Parse.GetVec(false);
+                    final GeomBuilder.Vec3f Vec = Parse.GetVec(1, 3);
                     if (TexCoords == null)
                       {
                         TexCoords = new ArrayList<GeomBuilder.Vec3f>();
@@ -687,7 +698,7 @@ public class ObjReader
                   }
                 else if (Op == "vn")
                   {
-                    final GeomBuilder.Vec3f Vec = Parse.GetVec(false);
+                    final GeomBuilder.Vec3f Vec = Parse.GetVec(3, 3);
                     if (Normals == null)
                       {
                         Normals = new ArrayList<GeomBuilder.Vec3f>();
