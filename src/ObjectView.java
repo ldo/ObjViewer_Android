@@ -121,13 +121,6 @@ public class ObjectView extends android.opengl.GLSurfaceView
                           ),
                         TheObject.BoundMax.z - TheObject.BoundMin.z
                       );
-                System.err.printf
-                  (
-                    "ObjViewer.ObjectViewer: object bounds min (%.2f, %.2f, %.2f) max (%.2f, %.2f, %.2f), scale by %e\n",
-                    TheObject.BoundMin.x, TheObject.BoundMin.y, TheObject.BoundMin.z,
-                    TheObject.BoundMax.x, TheObject.BoundMax.y, TheObject.BoundMax.z,
-                    1.0f / MaxDim
-                  ); /* debug */
                 gl.glTranslatef(0.0f, 0.0f, -2.5f);
                 CurRotation.Apply(gl);
                 gl.glScalef(2.0f / MaxDim, 2.0f / MaxDim, 2.0f / MaxDim);
@@ -224,13 +217,6 @@ public class ObjectView extends android.opengl.GLSurfaceView
             final float AnimAmt =
                 AnimFunction.getInterpolation((float)((CurrentTime - StartTime) / (EndTime - StartTime)));
             CurRotation = DeltaRotation.mul(AnimAmt).mul(StartRotation);
-            System.err.printf
-              (
-                "ObjectView anim at time %.3f => %.3f %s\n",
-                (CurrentTime - StartTime) / (EndTime - StartTime),
-                AnimAmt,
-                CurRotation
-              ); /* debug */
             requestRender();
             if (CurrentTime < EndTime)
               {

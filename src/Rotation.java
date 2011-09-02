@@ -112,12 +112,6 @@ public class Rotation
           {
             gl.glRotatef((float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag);
           } /*if*/
-        System.err.printf
-          (
-            "Rotation.Apply: %s => %.2f° about (%e, %e, %e)\n",
-            this.toString(),
-            (float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag
-          ); /* debug */
       } /*Apply*/
 
     public String toString()
