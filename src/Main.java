@@ -69,6 +69,63 @@ public class Main extends android.app.Activity
           ); 
       } /*SelectedIDAction*/
 
+    private ObjReader.Model ReadObj
+      (
+        final String ObjFileName
+      )
+      {
+        ObjReader.Model Result = null;
+        try
+          {
+            Result = ObjReader.ReadObj
+              (
+                /*FileName =*/ ObjFileName,
+                /*LoadMaterials =*/
+                    new ObjReader.MaterialLoader()
+                      {
+                        public ObjReader.MaterialSet Load
+                          (
+                            ObjReader.MaterialSet Materials,
+                            String MatFileName
+                          )
+                          {
+                            return
+                                ObjReader.ReadMaterials
+                                  (
+                                    /*FileName =*/
+                                        new java.io.File
+                                          (
+                                            new java.io.File(ObjFileName)
+                                                .getParentFile(),
+                                            MatFileName
+                                          ).getPath(),
+                                    /*CurMaterials =*/ Materials
+                                  );
+                          } /*Load*/
+                      } /*MaterialLoader*/
+              );
+          }
+        catch (ObjReader.DataFormatException Failed)
+          {
+            android.widget.Toast.makeText
+              (
+                /*context =*/ this,
+                /*text =*/
+                    String.format
+                      (
+                        getString(R.string.obj_load_fail),
+                        Failed.toString()
+                      ),
+                /*duration =*/ android.widget.Toast.LENGTH_SHORT
+              ).show();
+          } /*try*/
+        return
+            Result;
+      } /*ReadObj*/
+
+    private String CurObjFileName = null;
+    private static final String CurFileKey = "curfile";
+
     private class OptionsDialog
         extends android.app.Dialog
         implements android.content.DialogInterface.OnDismissListener
@@ -302,53 +359,10 @@ public class Main extends android.app.Activity
                   )
                   {
                     final String ObjFileName = Data.getData().getPath();
-                    ObjReader.Model NewObj = null;
-                    try
-                      {
-                        NewObj = ObjReader.ReadObj
-                          (
-                            /*FileName =*/ ObjFileName,
-                            /*LoadMaterials =*/
-                                new ObjReader.MaterialLoader()
-                                  {
-                                    public ObjReader.MaterialSet Load
-                                      (
-                                        ObjReader.MaterialSet Materials,
-                                        String MatFileName
-                                      )
-                                      {
-                                        return
-                                            ObjReader.ReadMaterials
-                                              (
-                                                /*FileName =*/
-                                                    new java.io.File
-                                                      (
-                                                        new java.io.File(ObjFileName)
-                                                            .getParentFile(),
-                                                        MatFileName
-                                                      ).getPath(),
-                                                /*CurMaterials =*/ Materials
-                                              );
-                                      } /*Load*/
-                                  } /*MaterialLoader*/
-                          );
-                      }
-                    catch (ObjReader.DataFormatException Failed)
-                      {
-                        android.widget.Toast.makeText
-                          (
-                            /*context =*/ Main.this,
-                            /*text =*/
-                                String.format
-                                  (
-                                    getString(R.string.obj_load_fail),
-                                    Failed.toString()
-                                  ),
-                            /*duration =*/ android.widget.Toast.LENGTH_SHORT
-                          ).show();
-                      } /*try*/
+                    final ObjReader.Model NewObj = ReadObj(ObjFileName);
                     if (NewObj != null)
                       {
+                        CurObjFileName = ObjFileName;
                         TheObjectView.SetObject(NewObj);
                       } /*if*/
                   } /*Run*/
@@ -366,7 +380,29 @@ public class Main extends android.app.Activity
         setContentView(R.layout.main);
         TheObjectView = (ObjectView)findViewById(R.id.object_view);
         BuildActivityResultActions();
+        if (SavedInstanceState != null)
+          {
+          /* reload previously-viewed object */
+            CurObjFileName = SavedInstanceState.getString(CurFileKey);
+            if (CurObjFileName != null)
+              {
+                TheObjectView.SetObject(ReadObj(CurObjFileName));
+              } /*if*/
+          } /*if*/
       } /*onCreate*/
+
+    @Override
+    public void onSaveInstanceState
+      (
+        android.os.Bundle SavedInstanceState
+      )
+      {
+        if (CurObjFileName != null)
+          {
+          /* remember what file I was looking at */
+            SavedInstanceState.putString(CurFileKey, CurObjFileName);
+          } /*if*/
+      } /*onSaveInstanceState*/
 
     @Override
     public boolean onOptionsItemSelected
