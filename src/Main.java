@@ -388,6 +388,8 @@ public class Main extends android.app.Activity
               {
                 TheObjectView.SetObject(ReadObj(CurObjFileName));
               } /*if*/
+            TheObjectView.onRestoreInstanceState(SavedInstanceState.getParcelable("ObjectView"));
+              /* doesn't seem to be done by GLSurfaceView */
           } /*if*/
       } /*onCreate*/
 
@@ -402,6 +404,8 @@ public class Main extends android.app.Activity
           /* remember what file I was looking at */
             SavedInstanceState.putString(CurFileKey, CurObjFileName);
           } /*if*/
+        SavedInstanceState.putParcelable("ObjectView", TheObjectView.onSaveInstanceState());
+          /* doesn't seem to be done by GLSurfaceView */
       } /*onSaveInstanceState*/
 
     @Override

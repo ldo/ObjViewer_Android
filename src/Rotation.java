@@ -19,7 +19,7 @@ package nz.gen.geek_central.GLUseful;
 
 import javax.microedition.khronos.opengles.GL10;
 
-public class Rotation
+public class Rotation implements android.os.Parcelable
   {
     public final float c, x, y, z;
 
@@ -61,6 +61,60 @@ public class Rotation
         this.y = y;
         this.z = z;
       } /*Rotation*/
+
+    public static android.os.Parcelable.Creator<Rotation> CREATOR =
+      /* restore state from a Parcel. */
+        new android.os.Parcelable.Creator<Rotation>()
+          {
+            public Rotation createFromParcel
+              (
+                android.os.Parcel Post
+              )
+              {
+                final android.os.Bundle MyState = Post.readBundle();
+                return
+                    new Rotation
+                      (
+                        MyState.getFloat("c", Null.c),
+                        MyState.getFloat("x", Null.x),
+                        MyState.getFloat("y", Null.y),
+                        MyState.getFloat("z", Null.z),
+                        null
+                      );
+              } /*createFromParcel*/
+
+            public Rotation[] newArray
+              (
+                int NrElts
+              )
+              {
+                return
+                    new Rotation[NrElts];
+              } /*newArray*/
+          } /*Parcelable.Creator*/;
+
+    @Override
+    public int describeContents()
+      {
+        return
+            0; /* nothing special */
+      } /*describeContents*/
+
+    @Override
+    public void writeToParcel
+      (
+        android.os.Parcel Post,
+        int Flags
+      )
+      /* save state to a Parcel. */
+      {
+        final android.os.Bundle MyState = new android.os.Bundle();
+        MyState.putFloat("c", c);
+        MyState.putFloat("x", x);
+        MyState.putFloat("y", y);
+        MyState.putFloat("z", z);
+        Post.writeBundle(MyState);
+      } /*writeToParcel*/
 
     public Rotation inv()
       /* returns rotation by the opposite angle around the same axis. Or alternatively,

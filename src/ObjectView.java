@@ -26,10 +26,14 @@ import android.view.MotionEvent;
 
 public class ObjectView extends android.opengl.GLSurfaceView
   {
+    private static boolean DefaultUseLighting = false;
+    private static boolean DefaultClockwiseFaces = false;
+    private static Rotation DefaultRotation = Rotation.Null;
+
     private ObjReader.Model TheObject = null;
-    private boolean UseLighting = false;
-    private boolean ClockwiseFaces = false;
-    private Rotation CurRotation = Rotation.Null;
+    private boolean UseLighting = DefaultUseLighting;
+    private boolean ClockwiseFaces = DefaultClockwiseFaces;
+    private Rotation CurRotation = DefaultRotation;
     private PointF LastMouse = null;
 
     private class ObjectViewRenderer implements Renderer
@@ -232,7 +236,106 @@ public class ObjectView extends android.opengl.GLSurfaceView
 
     private RotationAnimator CurrentAnim = null;
 
-  /* save/restore instance state? */
+    protected static class SavedObjectViewState extends android.view.AbsSavedState
+      /* for saving/restoring instance state */
+      {
+        public static android.os.Parcelable.Creator<SavedObjectViewState> CREATOR =
+            new android.os.Parcelable.Creator<SavedObjectViewState>()
+              {
+                public SavedObjectViewState createFromParcel
+                  (
+                    android.os.Parcel SavedState
+                  )
+                  {
+                    final android.view.AbsSavedState SuperState =
+                        android.view.AbsSavedState.CREATOR.createFromParcel(SavedState);
+                    final android.os.Bundle MyState = SavedState.readBundle();
+                    return
+                        new SavedObjectViewState
+                          (
+                            SuperState,
+                            MyState.getBoolean("UseLighting", DefaultUseLighting),
+                            MyState.getBoolean("ClockwiseFaces", DefaultClockwiseFaces),
+                            (Rotation)MyState.getParcelable("CurRotation")
+                          );
+                  } /*createFromParcel*/
+
+                public SavedObjectViewState[] newArray
+                  (
+                    int NrElts
+                  )
+                  {
+                    return
+                        new SavedObjectViewState[NrElts];
+                  } /*newArray*/
+              } /*Parcelable.Creator*/;
+
+        public final android.os.Parcelable SuperState;
+      /* state that I'm actually interested in saving/restoring: */
+        public final boolean UseLighting;
+        public final boolean ClockwiseFaces;
+        public final Rotation CurRotation;
+
+        public SavedObjectViewState
+          (
+            android.os.Parcelable SuperState,
+            boolean UseLighting,
+            boolean ClockwiseFaces,
+            Rotation CurRotation
+          )
+          {
+            super(SuperState);
+            this.SuperState = SuperState;
+            this.UseLighting = UseLighting;
+            this.ClockwiseFaces = ClockwiseFaces;
+            this.CurRotation = CurRotation;
+          } /*SavedObjectViewState*/
+
+        public void writeToParcel
+          (
+            android.os.Parcel SavedState,
+            int Flags
+          )
+          {
+            super.writeToParcel(SavedState, Flags);
+          /* put my state in a Bundle, where each item is associated with a
+            keyword name (unlike the Parcel itself, where items are identified
+            by order). I think this makes things easier to understand. */
+            final android.os.Bundle MyState = new android.os.Bundle();
+            MyState.putBoolean("UseLighting", UseLighting);
+            MyState.putBoolean("ClockwiseFaces", ClockwiseFaces);
+            MyState.putParcelable("CurRotation", CurRotation);
+            SavedState.writeBundle(MyState);
+          } /*writeToParcel*/
+
+      } /*SavedObjectViewState*/
+
+    @Override
+    public android.os.Parcelable onSaveInstanceState()
+      {
+        return
+            new SavedObjectViewState
+              (
+                super.onSaveInstanceState(),
+                UseLighting,
+                ClockwiseFaces,
+                CurRotation
+              );
+      } /*onSaveInstanceState*/
+
+    @Override
+    public void onRestoreInstanceState
+      (
+        android.os.Parcelable SavedState
+      )
+      {
+        final SavedObjectViewState MyState = (SavedObjectViewState)SavedState;
+        super.onRestoreInstanceState(MyState.SuperState);
+        UseLighting = MyState.UseLighting;
+        ClockwiseFaces = MyState.ClockwiseFaces;
+        CurRotation = MyState.CurRotation;
+        requestRender();
+      } /*onRestoreInstanceState*/
 
     @Override
     public boolean onTouchEvent
