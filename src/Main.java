@@ -394,6 +394,20 @@ public class Main extends android.app.Activity
       } /*onCreate*/
 
     @Override
+    public void onPause()
+      {
+        super.onPause();
+        TheObjectView.onPause();
+      } /*onPause*/
+
+    @Override
+    public void onResume()
+      {
+        super.onResume();
+        TheObjectView.onResume();
+      } /*onResume*/
+
+    @Override
     public void onSaveInstanceState
       (
         android.os.Bundle SavedInstanceState
