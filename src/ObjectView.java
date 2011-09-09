@@ -511,7 +511,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
             /*NewOrientation =*/ NewOrientation,
             /*AnimFunction =*/
                 Animate ?
-                    new android.view.animation.AccelerateDecelerateInterpolator()
+                    new PolyAccelerationDecelerationInterpolator(3.0f)
                 :
                     null,
             /*AnimDuration =*/ 1.5f
