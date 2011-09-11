@@ -125,7 +125,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                           ),
                         TheObject.BoundMax.z - TheObject.BoundMin.z
                       );
-                final float Scale = 3.0f;
+                final float Scale = 2.5f;
                 gl.glTranslatef(0.0f, 0.0f, -2.5f);
                 CurRotation.Apply(gl);
                 gl.glScalef(Scale / MaxDim, Scale / MaxDim, Scale / MaxDim);
