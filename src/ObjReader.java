@@ -18,7 +18,7 @@ package nz.gen.geek_central.GLUseful;
 */
 
 import java.util.ArrayList;
-import javax.microedition.khronos.opengles.GL10;
+import android.opengl.GLES11;
 
 public class ObjReader
   {
@@ -114,17 +114,14 @@ public class ObjReader
             this.Illum = Illum != null ? Illum : DefaultIllum;
           } /*Material*/
 
-        public void Apply
-          (
-            GL10 gl
-          )
-          /* sets the material settings into the GL context. */
+        public void Apply()
+          /* sets the material settings into the current GL context. */
           {
           /* Illum NYI */
-            gl.glMaterialfv
+            GLES11.glMaterialfv
               (
-                /*face =*/ GL10.GL_FRONT_AND_BACK,
-                /*pname =*/ GL10.GL_AMBIENT,
+                /*face =*/ GLES11.GL_FRONT_AND_BACK,
+                /*pname =*/ GLES11.GL_AMBIENT,
                 /*params =*/
                     new float[]
                         {
@@ -135,10 +132,10 @@ public class ObjReader
                         },
                 /*offset =*/ 0
               );
-            gl.glMaterialfv
+            GLES11.glMaterialfv
               (
-                /*face =*/ GL10.GL_FRONT_AND_BACK,
-                /*pname =*/ GL10.GL_DIFFUSE,
+                /*face =*/ GLES11.GL_FRONT_AND_BACK,
+                /*pname =*/ GLES11.GL_DIFFUSE,
                 /*params =*/
                     new float[]
                         {
@@ -149,10 +146,10 @@ public class ObjReader
                         },
                 /*offset =*/ 0
               );
-            gl.glMaterialfv
+            GLES11.glMaterialfv
               (
-                /*face =*/ GL10.GL_FRONT_AND_BACK,
-                /*pname =*/ GL10.GL_SPECULAR,
+                /*face =*/ GLES11.GL_FRONT_AND_BACK,
+                /*pname =*/ GLES11.GL_SPECULAR,
                 /*params =*/
                     new float[]
                         {
@@ -163,10 +160,10 @@ public class ObjReader
                         },
                 /*offset =*/ 0
               );
-            gl.glMaterialf
+            GLES11.glMaterialf
               (
-                /*face =*/ GL10.GL_FRONT_AND_BACK,
-                /*pname =*/ GL10.GL_SHININESS,
+                /*face =*/ GLES11.GL_FRONT_AND_BACK,
+                /*pname =*/ GLES11.GL_SHININESS,
                 /*param =*/ SpecularExponent
               );
           } /*Apply*/
@@ -590,18 +587,15 @@ public class ObjReader
             this.BoundMax = BoundMax;
           } /*Model*/
 
-        public void Draw
-          (
-            GL10 gl
-          )
+        public void Draw()
           {
             for (Component ThisComponent : Components)
               {
                 if (ThisComponent.ObjMaterial != null)
                   {
-                    ThisComponent.ObjMaterial.Apply(gl);
+                    ThisComponent.ObjMaterial.Apply();
                   } /*if*/
-                ThisComponent.ObjGeometry.Draw(gl);
+                ThisComponent.ObjGeometry.Draw();
               } /*for*/
           } /*Draw*/
 

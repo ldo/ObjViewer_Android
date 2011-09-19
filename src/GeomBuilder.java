@@ -23,7 +23,7 @@ import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import java.nio.ShortBuffer;
 import java.nio.ByteOrder;
-import javax.microedition.khronos.opengles.GL10;
+import android.opengl.GLES11;
 
 public class GeomBuilder
   /*
@@ -242,34 +242,31 @@ public class GeomBuilder
             this.BoundMax = BoundMax;
           } /*Obj*/
 
-        public void Draw
-          (
-            GL10 gl
-          )
+        public void Draw()
           /* actually renders the geometry into the specified GL context. */
           {
-            gl.glEnableClientState(GL10.GL_VERTEX_ARRAY);
-            gl.glVertexPointer(3, GL10.GL_FIXED, 0, VertexBuffer);
+            GLES11.glEnableClientState(GLES11.GL_VERTEX_ARRAY);
+            GLES11.glVertexPointer(3, GLES11.GL_FIXED, 0, VertexBuffer);
             if (NormalBuffer != null)
               {
-                gl.glEnableClientState(GL10.GL_NORMAL_ARRAY);
-                gl.glNormalPointer(GL10.GL_FIXED, 0, NormalBuffer);
+                GLES11.glEnableClientState(GLES11.GL_NORMAL_ARRAY);
+                GLES11.glNormalPointer(GLES11.GL_FIXED, 0, NormalBuffer);
               } /*if*/
             if (TexCoordBuffer != null)
               {
-                gl.glEnableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-                gl.glTexCoordPointer(3, GL10.GL_FIXED, 0, TexCoordBuffer);
+                GLES11.glEnableClientState(GLES11.GL_TEXTURE_COORD_ARRAY);
+                GLES11.glTexCoordPointer(3, GLES11.GL_FIXED, 0, TexCoordBuffer);
               } /*if*/
             if (ColorBuffer != null)
               {
-                gl.glEnableClientState(GL10.GL_COLOR_ARRAY);
-                gl.glColorPointer(4, GL10.GL_FIXED, 0, ColorBuffer);
+                GLES11.glEnableClientState(GLES11.GL_COLOR_ARRAY);
+                GLES11.glColorPointer(4, GLES11.GL_FIXED, 0, ColorBuffer);
               } /*if*/
-            gl.glDrawElements(GL10.GL_TRIANGLES, NrIndexes, GL10.GL_UNSIGNED_SHORT, IndexBuffer);
-            gl.glDisableClientState(GL10.GL_VERTEX_ARRAY);
-            gl.glDisableClientState(GL10.GL_NORMAL_ARRAY);
-            gl.glDisableClientState(GL10.GL_TEXTURE_COORD_ARRAY);
-            gl.glDisableClientState(GL10.GL_COLOR_ARRAY);
+            GLES11.glDrawElements(GLES11.GL_TRIANGLES, NrIndexes, GLES11.GL_UNSIGNED_SHORT, IndexBuffer);
+            GLES11.glDisableClientState(GLES11.GL_VERTEX_ARRAY);
+            GLES11.glDisableClientState(GLES11.GL_NORMAL_ARRAY);
+            GLES11.glDisableClientState(GLES11.GL_TEXTURE_COORD_ARRAY);
+            GLES11.glDisableClientState(GLES11.GL_COLOR_ARRAY);
           } /*Draw*/
 
       } /*Obj*/

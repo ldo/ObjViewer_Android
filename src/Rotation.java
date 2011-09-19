@@ -17,7 +17,7 @@ package nz.gen.geek_central.GLUseful;
     the License.
 */
 
-import javax.microedition.khronos.opengles.GL10;
+import android.opengl.GLES11;
 
 public class Rotation implements android.os.Parcelable
   {
@@ -155,16 +155,13 @@ public class Rotation implements android.os.Parcelable
                 new Rotation(0, 0, 0, 1);
       } /*mul*/
 
-    public void Apply
-      (
-        GL10 gl
-      )
+    public void Apply()
       /* applies the rotation to the currently-selected GL matrix. */
       {
         final float Mag = android.util.FloatMath.sqrt(x * x + y * y + z * z);
         if (Mag != 0.0f)
           {
-            gl.glRotatef((float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag);
+            GLES11.glRotatef((float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag);
           } /*if*/
       } /*Apply*/
 
