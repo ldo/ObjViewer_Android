@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
       package="nz.gen.geek_central.ObjViewer"
       android:versionCode="1"
-      android:versionName="15218.9"
+      android:versionName="15236.0"
 >
     <uses-sdk
         android:minSdkVersion="7"

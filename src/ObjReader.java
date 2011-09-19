@@ -381,6 +381,50 @@ public class ObjReader
             InComment = false;
           } /*EndLine*/
 
+        public String GetRestOfLine()
+          /* returns rest of current line (excluding leading whitespace, but
+            including embedded whitespace) as a symbol. There must be at least
+            one non-whitespace character. */
+          {
+            final StringBuilder CurSym = new StringBuilder();
+            for (;;)
+              {
+                if (EOL)
+                    break;
+                final char Ch = NextCh();
+                if (!InComment)
+                  {
+                    if (IsEOL(Ch))
+                      {
+                        break;
+                      }
+                    else if (IsSeparator(Ch) && CurSym.length() == 0)
+                      {
+                      /* ignore leading whitespace */
+                      }
+                    else if (Ch == '#')
+                      {
+                        InComment = true;
+                      }
+                    else
+                      {
+                        CurSym.appendCodePoint((int)Ch);
+                      } /*if*/
+                  } /*if*/
+              } /*for*/
+            final String Result =
+                CurSym.length() != 0 ?
+                    CurSym.toString()
+                :
+                    null;
+            if (Result == null)
+              {
+                Fail("missing required symbol");
+              } /*if*/
+            return
+                Result;
+          } /*GetRestOfLine*/
+
         public float GetFloat
           (
             String Description
@@ -833,22 +877,15 @@ public class ObjReader
                   }
                 else if (Op == "mtllib")
                   {
-                    boolean First = true;
-                    for (;;) /* expect one or more materials library file names */
+                  /* Blender only expects a single library file name, which might have embedded spaces */
+                    LoadedMaterials = LoadMaterials.Load(LoadedMaterials, Parse.GetRestOfLine());
+                    if (LoadedMaterials == null)
                       {
-                        final String LibName = Parse.NextSym(First);
-                        if (LibName == null)
-                            break;
-                        LoadedMaterials = LoadMaterials.Load(LoadedMaterials, LibName);
-                        if (LoadedMaterials == null)
-                          {
-                            Parse.Fail
-                              (
-                                "materials loader didn't return anything"
-                              );
-                          } /*if*/
-                        First = false;
-                      } /*for*/
+                        Parse.Fail
+                          (
+                            "materials loader didn't return anything"
+                          );
+                      } /*if*/
                   }
                 else
                   {
