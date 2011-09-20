@@ -8,25 +8,6 @@
     <property file="local.properties" />
     <property file="keystore.properties" />
 
-    <!-- The build.properties file can be created by you and is never touched
-         by the 'android' tool. This is the place to change some of the
-         default property values used by the Ant rules.
-         Here are some properties you may want to change/update:
-
-         source.dir
-             The name of the source directory. Default is 'src'.
-         out.dir
-             The name of the output directory. Default is 'bin'.
-
-         Properties related to the SDK location or the project target should
-         be updated using the 'android' tool with the 'update' action.
-
-         This file is an integral part of the build system for your
-         application and should be checked into Version Control Systems.
-
-         -->
-    <property file="build.properties" />
-
     <!-- The default.properties file is created and updated by the 'android'
          tool, as well as ADT.
          This file is an integral part of the build system for your
