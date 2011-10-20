@@ -10,10 +10,6 @@ tree: local.properties, and keystore.properties. These are excluded
 from the Git repository because their contents are specific to your
 setup.
 
-NOTE: You will need version r13 or earlier of the Android SDK,
-the newly-released r14 will not work. Look for an update soon to
-fix this.
-
 local.properties defines a property sdk.dir, which points to the
 top-level directory where you installed the Android SDK. E.g.
 
