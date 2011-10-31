@@ -6,9 +6,8 @@
 >
     <nz.gen.geek_central.ObjViewer.ObjectView
         android:id="@+id/object_view"
-        android:layout_width="250dp" 
-        android:layout_height="250dp" 
+        android:layout_width="250dp"
+        android:layout_height="250dp"
         android:layout_gravity="center"
     />
 </LinearLayout>
-
