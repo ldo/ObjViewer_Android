@@ -22,5 +22,6 @@
     <string name="anticlockwise">Anticlockwise</string>
 
   <!-- messages -->
+    <string name="startup_prompt">Use Menu/Open... to open a .obj file</string>
     <string name="obj_load_fail">Error loading file: %s</string>
 </resources>
