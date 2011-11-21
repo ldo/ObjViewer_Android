@@ -62,6 +62,12 @@ public class ObjectView extends android.opengl.GLSurfaceView
                 if (UseLighting)
                   {
                     GLES11.glEnable(GLES11.GL_LIGHTING);
+                    GLES11.glLightModelfv
+                      (
+                        /*pname =*/ GLES11.GL_LIGHT_MODEL_AMBIENT,
+                        /*params =*/ new float[] {0.3f, 0.3f, 0.3f, 1.0f},
+                        /*offset =*/ 0
+                      ); /* so hopefully objects are never completely black */
                   /* light positions are fixed relative to view */
                     GLES11.glEnable(GLES11.GL_LIGHT0);
                     GLES11.glLightfv
