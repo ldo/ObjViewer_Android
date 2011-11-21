@@ -27,7 +27,7 @@ import android.view.MotionEvent;
 
 public class ObjectView extends android.opengl.GLSurfaceView
   {
-    private static boolean DefaultUseLighting = false;
+    private static boolean DefaultUseLighting = true;
     private static boolean DefaultClockwiseFaces = false;
     private static Rotation DefaultRotation = Rotation.Null;
 
