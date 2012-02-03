@@ -352,19 +352,20 @@ public class Main extends android.app.Activity
             LoadObjectRequest,
             new RequestResponseAction()
               {
+              /* TBD change Picker to send intent directly back to Main
+                instead of via onActivityResult */
                 public void Run
                   (
                     int ResultCode,
                     android.content.Intent Data
                   )
                   {
-                    final String ObjFileName = Data.getData().getPath();
-                    final ObjReader.Model NewObj = ReadObj(ObjFileName);
-                    if (NewObj != null)
-                      {
-                        CurObjFileName = ObjFileName;
-                        TheObjectView.SetObject(NewObj);
-                      } /*if*/
+                    System.err.println("ObjViewer.Main got activity result data " + Data.getData()); /* debug */
+                    startActivity
+                      (
+                        new android.content.Intent(android.content.Intent.ACTION_VIEW, Data.getData())
+                            .setClass(Main.this, Main.class)
+                      );
                   } /*Run*/
               } /*RequestResponseAction*/
           );
@@ -397,7 +398,31 @@ public class Main extends android.app.Activity
             /*text =*/ getString(R.string.startup_prompt),
             /*duration =*/ android.widget.Toast.LENGTH_SHORT
           ).show();
+        onNewIntent(getIntent());
       } /*onCreate*/
+
+    @Override
+    protected void onNewIntent
+      (
+        android.content.Intent TheIntent
+      )
+      {
+        String Action = TheIntent.getAction();
+        if (Action != null)
+          {
+            Action = Action.intern();
+          } /*if*/
+        if (Action == android.content.Intent.ACTION_VIEW)
+          {
+            final String ObjFileName = TheIntent.getData().getPath();
+            final ObjReader.Model NewObj = ReadObj(ObjFileName);
+            if (NewObj != null)
+              {
+                CurObjFileName = ObjFileName;
+                TheObjectView.SetObject(NewObj);
+              } /*if*/
+          } /*if*/
+      } /*onnewIntent*/
 
     @Override
     public void onPause()

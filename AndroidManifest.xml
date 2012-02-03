@@ -2,7 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="nz.gen.geek_central.ObjViewer"
     android:versionCode="1"
-    android:versionName="15236.0"
+    android:versionName="15373.3"
 >
     <uses-sdk
         android:minSdkVersion="7"
@@ -18,6 +18,13 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <data android:scheme="file"/>
+                <data android:pathPattern=".*\\.obj"/>
+                <data android:mimeType="model/obj"/>
             </intent-filter>
         </activity>
         <activity
