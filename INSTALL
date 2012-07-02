@@ -1,11 +1,7 @@
 To build the ObjViewer app for Android, you will need the Android SDK,
 available from <http://developer.android.com/>, along with its
 prerequisites, including a Java developer kit (either OpenJDK or the
-Sun JDK) and Ant. Don't forget to point the JAVA_HOME environment
-variable to where the JDK is installed, e.g. with OpenJDK on
-Debian-AMD64:
-
-    export JAVA_HOME=/usr/lib/jvm/java-6-openjdk-amd64/jre
+Sun JDK) and Ant.
 
 You will need to add a couple of files to the top of the source
 tree: local.properties, and keystore.properties. These are excluded
