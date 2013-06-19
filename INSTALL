@@ -34,7 +34,7 @@ the JDK keytool command, something like this:
         -dname "CN=J Random Hacker, O=HackerCo, L=Anytown, ST=Anystate, C=US" 
 
 substituting your own filename for keystorename, your own password
-for storepass, your own name for the key for keyalias, and of course
+for keystorepassword, your own name for the key for keyalias, and of course
 your own identification details in the value for -dname.
 
 Now you should be able to build the complete package with the
