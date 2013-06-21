@@ -391,13 +391,16 @@ public class Main extends android.app.Activity
               } /*if*/
             TheObjectView.onRestoreInstanceState(SavedInstanceState.getParcelable("ObjectView"));
               /* doesn't seem to be done by GLSurfaceView */
+          }
+        else
+          {
+            android.widget.Toast.makeText
+              (
+                /*context =*/ this,
+                /*text =*/ getString(R.string.startup_prompt),
+                /*duration =*/ android.widget.Toast.LENGTH_SHORT
+              ).show();
           } /*if*/
-        android.widget.Toast.makeText
-          (
-            /*context =*/ this,
-            /*text =*/ getString(R.string.startup_prompt),
-            /*duration =*/ android.widget.Toast.LENGTH_SHORT
-          ).show();
         onNewIntent(getIntent());
       } /*onCreate*/
 
