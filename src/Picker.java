@@ -2,7 +2,7 @@ package nz.gen.geek_central.ObjViewer;
 /*
     let the user choose an obj file to load
 
-    Copyright 2011 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
+    Copyright 2011, 2013 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not
     use this file except in compliance with the License. You may obtain a copy of
@@ -17,17 +17,16 @@ package nz.gen.geek_central.ObjViewer;
     the License.
 */
 
+import android.view.View;
+
 public class Picker extends android.app.Activity
   {
-    static boolean Reentered = false; /* sanity check */
-    public static Picker Current = null;
-
-    static String[] LookIn;
+    public static final String LookInID = "nz.gen.geek_central.ObjViewer.Picker.LookIn";
 
     android.widget.ListView PickerListView;
     SelectedItemAdapter PickerList;
 
-    public static class PickerItem
+    static class PickerItem
       {
         String FullPath;
         boolean Selected;
@@ -58,7 +57,7 @@ public class Picker extends android.app.Activity
         PickerItem CurSelected;
         android.widget.RadioButton LastChecked;
 
-        class OnSetCheck implements android.view.View.OnClickListener
+        class OnSetCheck implements View.OnClickListener
           {
             final PickerItem MyItem;
 
@@ -72,7 +71,7 @@ public class Picker extends android.app.Activity
 
             public void onClick
               (
-                android.view.View TheView
+                View TheView
               )
               {
                 if (MyItem != CurSelected)
@@ -111,14 +110,14 @@ public class Picker extends android.app.Activity
           } /*SelectedItemAdapter*/
 
         @Override
-        public android.view.View getView
+        public View getView
           (
             int Position,
-            android.view.View ReuseView,
+            View ReuseView,
             android.view.ViewGroup Parent
           )
           {
-            android.view.View TheView = ReuseView;
+            View TheView = ReuseView;
             if (TheView == null)
               {
                 TheView = TemplateInflater.inflate(ResID, null);
@@ -146,7 +145,6 @@ public class Picker extends android.app.Activity
       )
       {
         super.onCreate(savedInstanceState);
-        Picker.Current = this;
         setContentView(R.layout.picker);
         PickerList = new SelectedItemAdapter(this, R.layout.picker_item, getLayoutInflater());
         PickerListView = (android.widget.ListView)findViewById(R.id.item_list);
@@ -155,7 +153,7 @@ public class Picker extends android.app.Activity
           {
             final String ExternalStorage =
                 android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
-            for (String Here : LookIn)
+            for (String Here : getIntent().getStringArrayExtra(LookInID))
               {
                 final java.io.File ThisDir = new java.io.File(ExternalStorage + "/" + Here);
                 if (ThisDir.isDirectory())
@@ -173,11 +171,11 @@ public class Picker extends android.app.Activity
         PickerList.notifyDataSetChanged();
         ((android.widget.Button)findViewById(R.id.item_select)).setOnClickListener
           (
-            new android.view.View.OnClickListener()
+            new View.OnClickListener()
               {
                 public void onClick
                   (
-                    android.view.View TheView
+                    View TheView
                   )
                   {
                     PickerItem Selected = null;
@@ -196,6 +194,7 @@ public class Picker extends android.app.Activity
                       } /*for*/
                     if (Selected != null)
                       {
+                        System.err.printf("ObjViewer.Picker returning “%s”\n", Selected.FullPath); /* debug */
                         setResult
                           (
                             android.app.Activity.RESULT_OK,
@@ -214,45 +213,5 @@ public class Picker extends android.app.Activity
               } /*OnClickListener*/
           );
       } /*onCreate*/
-
-    @Override
-    public void onDestroy()
-      {
-        super.onDestroy();
-        Picker.Current = null;
-      } /*onDestroy*/
-
-    public static void Launch
-      (
-        android.app.Activity Acting,
-        int RequestCode,
-        String[] LookIn /* array of names of subdirectories within external storage */
-      )
-      {
-        if (!Reentered)
-          {
-            Reentered = true; /* until Picker activity terminates */
-            Picker.LookIn = LookIn;
-            Acting.startActivityForResult
-              (
-                new android.content.Intent(android.content.Intent.ACTION_PICK)
-                    .setClass(Acting, Picker.class),
-                RequestCode
-              );
-          }
-        else
-          {
-          /* can happen if user gets impatient and selects from menu twice, just ignore */
-          } /*if*/
-      } /*Launch*/
-
-    public static void Cleanup()
-      /* Client must call this to do explicit cleanup; I tried doing it in
-        onDestroy, but of course that gets called when user rotates screen,
-        which means picker context is lost. */
-      {
-        LookIn = null;
-        Reentered = false;
-      } /*Cleanup*/
 
   } /*Picker*/

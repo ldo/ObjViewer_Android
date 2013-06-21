@@ -2,7 +2,7 @@ package nz.gen.geek_central.ObjViewer;
 /*
     ObjViewer -- viewer for .obj files -- mainline.
 
-    Copyright 2011 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
+    Copyright 2011, 2013 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not
     use this file except in compliance with the License. You may obtain a copy of
@@ -234,16 +234,20 @@ public class Main extends android.app.Activity
               {
                 public void run()
                   {
-                    Picker.Launch
+                    startActivityForResult
                       (
-                        /*Acting =*/ Main.this,
-                        /*RequestCode =*/ LoadObjectRequest,
-                        /*LookIn =*/
-                            new String[]
-                                {
-                                    "Models",
-                                    "Download",
-                                }
+                        new android.content.Intent(android.content.Intent.ACTION_PICK)
+                            .setClass(Main.this, Picker.class)
+                            .putExtra
+                              (
+                                Picker.LookInID,
+                                new String[]
+                                    {
+                                        "Models",
+                                        "Download",
+                                    }
+                              ),
+                        LoadObjectRequest
                       );
                   } /*run*/
               } /*Runnable*/
@@ -352,14 +356,15 @@ public class Main extends android.app.Activity
             LoadObjectRequest,
             new RequestResponseAction()
               {
-              /* TBD change Picker to send intent directly back to Main
-                instead of via onActivityResult */
                 public void Run
                   (
                     int ResultCode,
                     android.content.Intent Data
                   )
                   {
+                  /* Unfortunately I can't send this Intent directly from the Picker
+                    without using some odd launch-mode settings to avoid another instance
+                    of Main being created. Which is why I do it here. */
                     startActivity
                       (
                         new android.content.Intent(android.content.Intent.ACTION_VIEW, Data.getData())
@@ -481,7 +486,7 @@ public class Main extends android.app.Activity
         android.content.Intent Data
       )
       {
-        Picker.Cleanup();
+        System.err.printf("ObjViewer.onActivityResult request %d result %d\n", RequestCode, ResultCode); /* debug */
         if (ResultCode != android.app.Activity.RESULT_CANCELED)
           {
             final RequestResponseAction Action = ActivityResultActions.get(RequestCode);
