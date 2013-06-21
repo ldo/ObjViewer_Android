@@ -360,11 +360,11 @@ public class Main extends android.app.Activity
                     android.content.Intent Data
                   )
                   {
-                    System.err.println("ObjViewer.Main got activity result data " + Data.getData()); /* debug */
                     startActivity
                       (
                         new android.content.Intent(android.content.Intent.ACTION_VIEW, Data.getData())
                             .setClass(Main.this, Main.class)
+                            .setFlags(android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP)
                       );
                   } /*Run*/
               } /*RequestResponseAction*/
