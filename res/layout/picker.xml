@@ -1,29 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:stretchColumns="0"
 >
-    <TableRow>
-        <TextView
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/picker_prompt"
-        />
-    </TableRow>
-    <TableRow>
-        <ListView
-            android:id="@+id/item_list"
-            android:layout_width="fill_parent"
-            android:layout_height="270dp"
-        />
-    </TableRow>
-    <TableRow>
-        <Button
-            android:id="@+id/item_select"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/open"
-        />
-    </TableRow>
-</TableLayout>
+    <TextView
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/picker_prompt"
+    />
+    <ListView
+        android:id="@+id/item_list"
+        android:layout_width="fill_parent"
+        android:layout_height="200dp"
+        android:layout_weight="100"
+    />
+    <Button
+        android:id="@+id/item_select"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/open"
+    />
+</LinearLayout>
