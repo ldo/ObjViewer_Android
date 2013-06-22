@@ -383,6 +383,12 @@ public class ObjectView extends android.opengl.GLSurfaceView
         ResetOrientation(false);
       } /*SetObject*/
 
+    public ObjReader.Model GetObject()
+      {
+        return
+            TheObject;
+      } /*GetObject*/
+
     public void SetUseLighting
       (
         boolean UseLighting

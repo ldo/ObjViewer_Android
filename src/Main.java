@@ -386,11 +386,16 @@ public class Main extends android.app.Activity
         setContentView(R.layout.main);
         TheObjectView = (ObjectView)findViewById(R.id.object_view);
         BuildActivityResultActions();
+        final ObjReader.Model PreviousModel = (ObjReader.Model)getLastNonConfigurationInstance();
+        if (PreviousModel != null)
+          {
+            TheObjectView.SetObject(PreviousModel);
+          } /*if*/
         if (SavedInstanceState != null)
           {
           /* reload previously-viewed object */
             CurObjFileName = SavedInstanceState.getString(CurFileKey);
-            if (CurObjFileName != null)
+            if (PreviousModel == null && CurObjFileName != null)
               {
                 TheObjectView.SetObject(ReadObj(CurObjFileName));
               } /*if*/
@@ -445,6 +450,14 @@ public class Main extends android.app.Activity
         super.onResume();
         TheObjectView.onResume();
       } /*onResume*/
+
+    @Override
+    public Object onRetainNonConfigurationInstance()
+      /* optimization to avoid re-reading .obj file */
+      {
+        return
+            TheObjectView.GetObject();
+      } /*onRetainNonConfigurationInstance*/
 
     @Override
     public void onSaveInstanceState
