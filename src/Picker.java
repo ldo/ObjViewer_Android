@@ -149,6 +149,7 @@ public class Picker extends android.app.Activity
         PickerList = new SelectedItemAdapter(this, R.layout.picker_item, getLayoutInflater());
         PickerListView = (android.widget.ListView)findViewById(R.id.item_list);
         PickerListView.setAdapter(PickerList);
+        PickerList.setNotifyOnChange(false);
         PickerList.clear();
           {
             final String ExternalStorage =
