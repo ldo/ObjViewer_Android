@@ -113,6 +113,7 @@ public class Main extends android.app.Activity
                 /*text =*/
                     String.format
                       (
+                        nz.gen.geek_central.GLUseful.GLUseful.StdLocale,
                         getString(R.string.obj_load_fail),
                         Failed.toString()
                       ),

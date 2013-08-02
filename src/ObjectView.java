@@ -19,12 +19,12 @@ package nz.gen.geek_central.ObjViewer;
 */
 
 import javax.microedition.khronos.opengles.GL10;
-import android.opengl.GLES11;
 import nz.gen.geek_central.GLUseful.ObjReader;
 import nz.gen.geek_central.GLUseful.Rotation;
 import android.graphics.PointF;
 import android.view.MotionEvent;
 import nz.gen.geek_central.android.useful.BundledSavedState;
+import static nz.gen.geek_central.GLUseful.GLUseful.gl;
 
 public class ObjectView extends android.opengl.GLSurfaceView
   {
@@ -52,79 +52,79 @@ public class ObjectView extends android.opengl.GLSurfaceView
 
         public void onDrawFrame
           (
-            GL10 gl
+            GL10 _gl
           )
           {
-            GLES11.glClear(GLES11.GL_COLOR_BUFFER_BIT | GLES11.GL_DEPTH_BUFFER_BIT);
-            GLES11.glMatrixMode(GLES11.GL_MODELVIEW);
-            GLES11.glLoadIdentity();
+            gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT);
+            gl.glMatrixMode(gl.GL_MODELVIEW);
+            gl.glLoadIdentity();
             if (TheObject != null)
               {
                 if (UseLighting)
                   {
-                    GLES11.glEnable(GLES11.GL_LIGHTING);
-                    GLES11.glLightModelfv
+                    gl.glEnable(gl.GL_LIGHTING);
+                    gl.glLightModelfv
                       (
-                        /*pname =*/ GLES11.GL_LIGHT_MODEL_AMBIENT,
+                        /*pname =*/ gl.GL_LIGHT_MODEL_AMBIENT,
                         /*params =*/ new float[] {0.3f, 0.3f, 0.3f, 1.0f},
                         /*offset =*/ 0
                       ); /* so hopefully objects are never completely black */
                   /* light positions are fixed relative to view */
-                    GLES11.glEnable(GLES11.GL_LIGHT0);
-                    GLES11.glLightfv
+                    gl.glEnable(gl.GL_LIGHT0);
+                    gl.glLightfv
                       (
-                        /*light =*/ GLES11.GL_LIGHT0,
-                        /*pname =*/ GLES11.GL_POSITION,
+                        /*light =*/ gl.GL_LIGHT0,
+                        /*pname =*/ gl.GL_POSITION,
                         /*params =*/ new float[] {0.0f, 2.0f, 0.0f, 1.0f},
                         /*offset =*/ 0
                       );
-                    GLES11.glLightfv
+                    gl.glLightfv
                       (
-                        /*light =*/ GLES11.GL_LIGHT0,
-                        /*pname =*/ GLES11.GL_AMBIENT,
+                        /*light =*/ gl.GL_LIGHT0,
+                        /*pname =*/ gl.GL_AMBIENT,
                         /*params =*/ new float[] {0.4f, 0.4f, 0.4f, 1.0f},
                         /*offset =*/ 0
                       );
-                    GLES11.glLightfv
+                    gl.glLightfv
                       (
-                        /*light =*/ GLES11.GL_LIGHT0,
-                        /*pname =*/ GLES11.GL_DIFFUSE,
+                        /*light =*/ gl.GL_LIGHT0,
+                        /*pname =*/ gl.GL_DIFFUSE,
                         /*params =*/ new float[] {0.7f, 0.7f, 0.7f, 1.0f},
                         /*offset =*/ 0
                       );
-                    GLES11.glLightfv
+                    gl.glLightfv
                       (
-                        /*light =*/ GLES11.GL_LIGHT0,
-                        /*pname =*/ GLES11.GL_SPECULAR,
+                        /*light =*/ gl.GL_LIGHT0,
+                        /*pname =*/ gl.GL_SPECULAR,
                         /*params =*/ new float[] {0.7f, 0.7f, 0.7f, 1.0f},
                         /*offset =*/ 0
                       );
-                    GLES11.glEnable(GLES11.GL_LIGHT1);
-                    GLES11.glLightfv
+                    gl.glEnable(gl.GL_LIGHT1);
+                    gl.glLightfv
                       (
-                        /*light =*/ GLES11.GL_LIGHT1,
-                        /*pname =*/ GLES11.GL_POSITION,
+                        /*light =*/ gl.GL_LIGHT1,
+                        /*pname =*/ gl.GL_POSITION,
                         /*params =*/ new float[] {0.0f, 0.0f, -2.0f, 1.0f},
                         /*offset =*/ 0
                       );
-                    GLES11.glLightfv
+                    gl.glLightfv
                       (
-                        /*light =*/ GLES11.GL_LIGHT1,
-                        /*pname =*/ GLES11.GL_DIFFUSE,
+                        /*light =*/ gl.GL_LIGHT1,
+                        /*pname =*/ gl.GL_DIFFUSE,
                         /*params =*/ new float[] {0.3f, 0.3f, 0.3f, 1.0f},
                         /*offset =*/ 0
                       );
-                    GLES11.glLightfv
+                    gl.glLightfv
                       (
-                        /*light =*/ GLES11.GL_LIGHT1,
-                        /*pname =*/ GLES11.GL_SPECULAR,
+                        /*light =*/ gl.GL_LIGHT1,
+                        /*pname =*/ gl.GL_SPECULAR,
                         /*params =*/ new float[] {0.3f, 0.3f, 0.3f, 1.0f},
                         /*offset =*/ 0
                       );
                   }
                 else
                   {
-                    GLES11.glDisable(GLES11.GL_LIGHTING);
+                    gl.glDisable(gl.GL_LIGHTING);
                   } /*if*/
                 final float MaxDim =
                     (float)Math.max
@@ -137,21 +137,21 @@ public class ObjectView extends android.opengl.GLSurfaceView
                         TheObject.BoundMax.z - TheObject.BoundMin.z
                       );
                 final float Scale = 2.5f;
-                GLES11.glTranslatef(0.0f, 0.0f, -2.5f);
+                gl.glTranslatef(0.0f, 0.0f, -2.5f);
                 CurRotation.Apply();
-                GLES11.glScalef(Scale / MaxDim, Scale / MaxDim, Scale / MaxDim);
-                GLES11.glTranslatef
+                gl.glScalef(Scale / MaxDim, Scale / MaxDim, Scale / MaxDim);
+                gl.glTranslatef
                   (
                     - (TheObject.BoundMax.x + TheObject.BoundMin.x) / 2.0f,
                     - (TheObject.BoundMax.y + TheObject.BoundMin.y) / 2.0f,
                     - (TheObject.BoundMax.z + TheObject.BoundMin.z) / 2.0f
                   );
-                GLES11.glFrontFace
+                gl.glFrontFace
                   (
                     ClockwiseFaces ? 
-                        GLES11.GL_CW
+                        gl.GL_CW
                     :
-                        GLES11.GL_CCW
+                        gl.GL_CCW
                   );
                 TheObject.Draw();
               } /*if*/
@@ -159,15 +159,15 @@ public class ObjectView extends android.opengl.GLSurfaceView
 
         public void onSurfaceChanged
           (
-            GL10 gl,
+            GL10 _gl,
             int ViewWidth,
             int ViewHeight
           )
           {
-            GLES11.glViewport(0, 0, ViewWidth, ViewHeight);
-            GLES11.glMatrixMode(GLES11.GL_PROJECTION);
-            GLES11.glLoadIdentity();
-            GLES11.glFrustumf
+            gl.glViewport(0, 0, ViewWidth, ViewHeight);
+            gl.glMatrixMode(gl.GL_PROJECTION);
+            gl.glLoadIdentity();
+            gl.glFrustumf
               (
                 /*l =*/ ViewWidth > ViewHeight ? - 1.0f : - (float)ViewWidth / ViewHeight,
                 /*r =*/ ViewWidth > ViewHeight ? 1.0f : (float)ViewWidth / ViewHeight,
@@ -180,14 +180,14 @@ public class ObjectView extends android.opengl.GLSurfaceView
 
         public void onSurfaceCreated
           (
-            GL10 gl,
+            GL10 _gl,
             javax.microedition.khronos.egl.EGLConfig Config
           )
           {
-            GLES11.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-            GLES11.glEnable(GLES11.GL_CULL_FACE);
-            GLES11.glShadeModel(GLES11.GL_SMOOTH);
-            GLES11.glEnable(GLES11.GL_DEPTH_TEST);
+            gl.glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+            gl.glEnable(gl.GL_CULL_FACE);
+            gl.glShadeModel(gl.GL_SMOOTH);
+            gl.glEnable(gl.GL_DEPTH_TEST);
           } /*onSurfaceCreated*/
 
       } /*ObjectViewRenderer*/

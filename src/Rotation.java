@@ -2,7 +2,7 @@ package nz.gen.geek_central.GLUseful;
 /*
     Quaternion representation of 3D rotation transformations.
 
-    Copyright 2011 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
+    Copyright 2011, 2013 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not
     use this file except in compliance with the License. You may obtain a copy of
@@ -17,7 +17,7 @@ package nz.gen.geek_central.GLUseful;
     the License.
 */
 
-import android.opengl.GLES11;
+import static nz.gen.geek_central.GLUseful.GLUseful.gl;
 
 public class Rotation implements android.os.Parcelable
   {
@@ -161,7 +161,7 @@ public class Rotation implements android.os.Parcelable
         final float Mag = android.util.FloatMath.sqrt(x * x + y * y + z * z);
         if (Mag != 0.0f)
           {
-            GLES11.glRotatef((float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag);
+            gl.glRotatef((float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag);
           } /*if*/
       } /*Apply*/
 
@@ -170,6 +170,7 @@ public class Rotation implements android.os.Parcelable
         return
             String.format
               (
+                GLUseful.StdLocale,
                 "Rotation(%e, %e, %e, %e)",
                 c, x, y, z
               );

@@ -2,7 +2,7 @@ package nz.gen.geek_central.GLUseful;
 /*
     Basic reader for .obj 3D model files and associated .mtl material files.
 
-    Copyright 2011 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
+    Copyright 2011, 2013 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not
     use this file except in compliance with the License. You may obtain a copy of
@@ -18,7 +18,7 @@ package nz.gen.geek_central.GLUseful;
 */
 
 import java.util.ArrayList;
-import android.opengl.GLES11;
+import static nz.gen.geek_central.GLUseful.GLUseful.gl;
 
 public class ObjReader
   {
@@ -118,10 +118,10 @@ public class ObjReader
           /* sets the material settings into the current GL context. */
           {
           /* Illum NYI */
-            GLES11.glMaterialfv
+            gl.glMaterialfv
               (
-                /*face =*/ GLES11.GL_FRONT_AND_BACK,
-                /*pname =*/ GLES11.GL_AMBIENT,
+                /*face =*/ gl.GL_FRONT_AND_BACK,
+                /*pname =*/ gl.GL_AMBIENT,
                 /*params =*/
                     new float[]
                         {
@@ -132,10 +132,10 @@ public class ObjReader
                         },
                 /*offset =*/ 0
               );
-            GLES11.glMaterialfv
+            gl.glMaterialfv
               (
-                /*face =*/ GLES11.GL_FRONT_AND_BACK,
-                /*pname =*/ GLES11.GL_DIFFUSE,
+                /*face =*/ gl.GL_FRONT_AND_BACK,
+                /*pname =*/ gl.GL_DIFFUSE,
                 /*params =*/
                     new float[]
                         {
@@ -146,10 +146,10 @@ public class ObjReader
                         },
                 /*offset =*/ 0
               );
-            GLES11.glMaterialfv
+            gl.glMaterialfv
               (
-                /*face =*/ GLES11.GL_FRONT_AND_BACK,
-                /*pname =*/ GLES11.GL_SPECULAR,
+                /*face =*/ gl.GL_FRONT_AND_BACK,
+                /*pname =*/ gl.GL_SPECULAR,
                 /*params =*/
                     new float[]
                         {
@@ -160,10 +160,10 @@ public class ObjReader
                         },
                 /*offset =*/ 0
               );
-            GLES11.glMaterialf
+            gl.glMaterialf
               (
-                /*face =*/ GLES11.GL_FRONT_AND_BACK,
-                /*pname =*/ GLES11.GL_SHININESS,
+                /*face =*/ gl.GL_FRONT_AND_BACK,
+                /*pname =*/ gl.GL_SHININESS,
                 /*param =*/ SpecularExponent
               );
           } /*Apply*/
@@ -215,6 +215,7 @@ public class ObjReader
               (
                 String.format
                   (
+                    GLUseful.StdLocale,
                     "ObjReader error at line %d, col %d: %s",
                     LineNr, ColNr,
                     Msg
@@ -781,7 +782,7 @@ public class ObjReader
                                   }
                                 catch (NumberFormatException BadNum)
                                   {
-                                    Parse.Fail(String.format("bad vertex index \"%s\"", VertStr.substring(LastPos, ThisPos)));
+                                    Parse.Fail(String.format(GLUseful.StdLocale, "bad vertex index \"%s\"", VertStr.substring(LastPos, ThisPos)));
                                   } /*try*/
                                 switch (Which)
                                   {
