@@ -335,7 +335,7 @@ public class Main extends android.app.Activity
                         X = Rand(),
                         Y = Rand(),
                         Z = Rand(),
-                        R = (float)android.util.FloatMath.sqrt(X * X + Y * Y + Z * Z),
+                        R = android.util.FloatMath.sqrt(X * X + Y * Y + Z * Z),
                         Angle = Rand() * 360.0f;
                     TheObjectView.SetOrientation
                       (

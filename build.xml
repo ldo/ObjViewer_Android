@@ -6,6 +6,7 @@
          Version Control Systems. -->
     <loadproperties srcFile="local.properties" />
     <loadproperties srcFile="keystore.properties" />
+    <!-- <property name="java.compilerargs" value="-Xlint" /> --> <!-- enable for extra warnings -->
 
     <!-- The ant.properties file can be created by you. It is only edited by the
          'android' tool to add properties to it.

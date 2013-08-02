@@ -127,7 +127,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                     gl.glDisable(gl.GL_LIGHTING);
                   } /*if*/
                 final float MaxDim =
-                    (float)Math.max
+                    Math.max
                       (
                         Math.max
                           (
