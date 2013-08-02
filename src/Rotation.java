@@ -62,7 +62,7 @@ public class Rotation implements android.os.Parcelable
         this.z = z;
       } /*Rotation*/
 
-    public static android.os.Parcelable.Creator<Rotation> CREATOR =
+    public static final android.os.Parcelable.Creator<Rotation> CREATOR =
       /* restore state from a Parcel. */
         new android.os.Parcelable.Creator<Rotation>()
           {
