@@ -79,28 +79,105 @@ public class GeomBuilder
 
       } /*Color*/
 
-    private final ArrayList<Vec3f> Points;
-    private final ArrayList<Vec3f> PointNormals;
-    private final ArrayList<Vec3f> PointTexCoords;
+    private final boolean AutoNormals;
+    private final ArrayList<Vec3f> TempPoints, TempPointTexCoords;
+    private final ArrayList<Color> TempPointColors;
+    private final ArrayList<Vec3f> Points, PointNormals, PointTexCoords;
     private final ArrayList<Color> PointColors;
     private final ArrayList<Integer> Faces;
     private Vec3f BoundMin, BoundMax;
 
     public GeomBuilder
       (
-        boolean GotNormals, /* vertices will have normals specified */
+        boolean GotNormals, /* vertices will have normals specified, otherwise they will be automatically generated for flat shading */
         boolean GotTexCoords, /* vertices will have texture coordinates specified */
         boolean GotColors /* vertices will have colours specified */
       )
       {
+        AutoNormals = !GotNormals;
+        TempPoints = AutoNormals ? new ArrayList<Vec3f>() : null;
         Points = new ArrayList<Vec3f>();
-        PointNormals = GotNormals ? new ArrayList<Vec3f>() : null;
+        PointNormals = GotNormals || AutoNormals ? new ArrayList<Vec3f>() :  null;
+        TempPointTexCoords = AutoNormals && GotTexCoords ? new ArrayList<Vec3f>() : null;
         PointTexCoords = GotTexCoords ? new ArrayList<Vec3f>() : null;
+        TempPointColors = AutoNormals && GotColors ? new ArrayList<Color>() : null;
         PointColors = GotColors ? new ArrayList<Color>() : null;
         Faces = new ArrayList<Integer>();
         BoundMin = null;
         BoundMax = null;
       } /*GeomBuilder*/
+
+    private int Add
+      (
+        Vec3f Vertex,
+      /* following args are either mandatory or must be null, depending
+        on respective flags passed to constructor */
+        Vec3f Normal,
+        Vec3f TexCoord,
+        Color VertexColor,
+        boolean AutoNormals
+      )
+      /* adds a new vertex, and returns its index for use in constructing faces. */
+      {
+        if
+          (
+                AutoNormals != (Normal == null)
+            ||
+                (PointColors == null) != (VertexColor == null)
+            ||
+                (PointTexCoords == null) != (TexCoord == null)
+          )
+          {
+            throw new RuntimeException("missing or redundant args specified");
+          } /*if*/
+        final int Result = AutoNormals && TempPoints != null ? TempPoints.size() : Points.size();
+        (AutoNormals ? TempPoints : Points).add(Vertex);
+        if (!AutoNormals)
+          {
+            PointNormals.add(Normal);
+          } /*if*/
+        if (PointTexCoords != null)
+          {
+            (AutoNormals ? TempPointTexCoords : PointTexCoords).add(TexCoord);
+          } /*if*/
+        if (PointColors != null)
+          {
+            (AutoNormals ? TempPointColors : PointColors).add(VertexColor);
+          } /*if*/
+        if (AutoNormals == this.AutoNormals)
+          {
+            if (BoundMin != null)
+              {
+                BoundMin =
+                    new Vec3f
+                      (
+                        Math.min(BoundMin.x, Vertex.x),
+                        Math.min(BoundMin.y, Vertex.y),
+                        Math.min(BoundMin.z, Vertex.z)
+                      );
+              }
+            else
+              {
+                BoundMin = Vertex;
+              } /*if*/
+            if (BoundMax != null)
+              {
+                BoundMax =
+                    new Vec3f
+                      (
+                        Math.max(BoundMax.x, Vertex.x),
+                        Math.max(BoundMax.y, Vertex.y),
+                        Math.max(BoundMax.z, Vertex.z)
+                      );
+              }
+            else
+              {
+                BoundMax = Vertex;
+              } /*if*/
+          } /*if*/
+        return
+            Result;
+      } /*Add*/
 
     public int Add
       (
@@ -113,62 +190,101 @@ public class GeomBuilder
       )
       /* adds a new vertex, and returns its index for use in constructing faces. */
       {
-        if
-          (
-                (PointNormals == null) != (Normal == null)
-            ||
-                (PointColors == null) != (VertexColor == null)
-            ||
-                (PointTexCoords == null) != (TexCoord == null)
-          )
+        return
+            Add
+              (
+                /*Vertex =*/ Vertex,
+                /*Normal =*/ Normal,
+                /*TexCoord =*/ TexCoord,
+                /*VertexColor =*/ VertexColor,
+                /*AutoNormals =*/ AutoNormals
+              );
+      } /*Add*/
+
+    private int AddActual
+      (
+        int VertIndex,
+        Vec3f Normal
+      )
+      {
+        if (!AutoNormals)
           {
-            throw new RuntimeException("missing or redundant args specified");
-          } /*if*/
-        final int Result = Points.size();
-        Points.add(Vertex);
-        if (PointNormals != null)
-          {
-            PointNormals.add(Normal);
-          } /*if*/
-        if (PointTexCoords != null)
-          {
-            PointTexCoords.add(TexCoord);
-          } /*if*/
-        if (PointColors != null)
-          {
-            PointColors.add(VertexColor);
-          } /*if*/
-        if (BoundMin != null)
-          {
-            BoundMin =
-                new Vec3f
-                  (
-                    Math.min(BoundMin.x, Vertex.x),
-                    Math.min(BoundMin.y, Vertex.y),
-                    Math.min(BoundMin.z, Vertex.z)
-                  );
-          }
-        else
-          {
-            BoundMin = Vertex;
-          } /*if*/
-        if (BoundMax != null)
-          {
-            BoundMax =
-                new Vec3f
-                  (
-                    Math.max(BoundMax.x, Vertex.x),
-                    Math.max(BoundMax.y, Vertex.y),
-                    Math.max(BoundMax.z, Vertex.z)
-                  );
-          }
-        else
-          {
-            BoundMax = Vertex;
+            throw new RuntimeException("GeomBuilder.AddCopy shouldn’t be called if not AutoNormals");
           } /*if*/
         return
-            Result;
-      } /*Add*/
+            Add
+              (
+                /*Vertex =*/ TempPoints.get(VertIndex),
+                /*Normal =*/ Normal,
+                /*TexCoord =*/ TempPointTexCoords != null ? TempPointTexCoords.get(VertIndex) : null,
+                /*VertexColor =*/ TempPointColors != null ? TempPointColors.get(VertIndex) : null,
+                /*AutoNormals =*/ false
+              );
+      } /*AddActual*/
+
+    private void GenAutoNormal
+      (
+        int[] Vertices
+          /* assume length at least 3 and coplanar if > 3, replaced with final generated vertices */
+      )
+      {
+        if (!AutoNormals)
+          {
+            throw new RuntimeException("GeomBuilder.GenAutoNormal shouldn’t be called if not AutoNormals");
+          } /*if*/
+        final Vec3f
+            V1 = TempPoints.get(Vertices[0]),
+            V2 = TempPoints.get(Vertices[1]),
+            V3 = TempPoints.get(Vertices[2]),
+            dV1 = new Vec3f(V2.x - V1.x, V2.y - V1.y, V2.z - V1.z),
+            dV2 = new Vec3f(V3.x - V2.x, V3.y - V2.y, V3.z - V2.z);
+        Vec3f FaceNormal =
+            new Vec3f
+              (
+                dV1.y * dV2.z - dV1.z * dV2.y,
+                dV1.z * dV2.x - dV1.x * dV2.z,
+                dV1.x * dV2.y - dV1.y * dV2.x
+              ); /* cross-product */
+        final float Magnitude =
+            android.util.FloatMath.sqrt
+              (
+                    FaceNormal.x * FaceNormal.x
+                +
+                    FaceNormal.y * FaceNormal.y
+                +
+                    FaceNormal.z * FaceNormal.z
+              );
+        FaceNormal =
+            new Vec3f(FaceNormal.x / Magnitude, FaceNormal.y / Magnitude, FaceNormal.z / Magnitude);
+        final int[] NewVertices = new int[Vertices.length];
+        for (int i = 0; i < Vertices.length; ++i)
+          {
+            NewVertices[i] = AddActual(Vertices[i], FaceNormal);
+          } /*for*/
+        System.arraycopy(NewVertices, 0, Vertices, 0, Vertices.length);
+      } /*GenAutoNormal*/
+
+    private void AddTri
+      (
+        int V1,
+        int V2,
+        int V3,
+        boolean AutoNormals
+      )
+      /* defines a triangular face. Args are indices as previously returned from calls to Add. */
+      {
+        if (AutoNormals)
+          {
+            final int[] Vertices = new int[] {V1, V2, V3};
+            GenAutoNormal(Vertices);
+            V1 = Vertices[0];
+            V2 = Vertices[1];
+            V3 = Vertices[2];
+          } /*if*/
+        Faces.add(V1);
+        Faces.add(V2);
+        Faces.add(V3);
+      } /*AddTri*/
 
     public void AddTri
       (
@@ -178,9 +294,7 @@ public class GeomBuilder
       )
       /* defines a triangular face. Args are indices as previously returned from calls to Add. */
       {
-        Faces.add(V1);
-        Faces.add(V2);
-        Faces.add(V3);
+        AddTri(V1, V2, V3, AutoNormals);
       } /*AddTri*/
 
     public void AddQuad
@@ -192,8 +306,17 @@ public class GeomBuilder
       )
       /* Defines a quadrilateral face. Args are indices as previously returned from calls to Add. */
       {
-        AddTri(V1, V2, V3);
-        AddTri(V4, V1, V3);
+        if (AutoNormals)
+          {
+            final int[] Vertices = new int[] {V1, V2, V3, V4};
+            GenAutoNormal(Vertices);
+            V1 = Vertices[0];
+            V2 = Vertices[1];
+            V3 = Vertices[2];
+            V4 = Vertices[3];
+          } /*if*/
+        AddTri(V1, V2, V3, false);
+        AddTri(V4, V1, V3, false);
       } /*AddQuad*/
 
     public void AddPoly
@@ -203,9 +326,16 @@ public class GeomBuilder
       /* Defines a polygonal face. Array elements are indices as previously
         returned from calls to Add. */
       {
+        if (AutoNormals)
+          {
+            final int[] V2 = new int[V.length];
+            System.arraycopy(V, 0, V2, 0, V.length);
+            GenAutoNormal(V2);
+            V = V2;
+          } /*if*/
         for (int i = 1; i < V.length - 1; ++i)
           {
-            AddTri(V[0], V[i], V[i + 1]);
+            AddTri(V[0], V[i], V[i + 1], false);
           } /*for*/
       } /*AddPoly*/
 
@@ -269,7 +399,7 @@ public class GeomBuilder
             gl.glDisableClientState(gl.GL_COLOR_ARRAY);
           } /*Draw*/
 
-      } /*Obj*/
+      } /*Obj*/;
 
     public Obj MakeObj()
       /* constructs and returns the final geometry ready for rendering. */
@@ -395,4 +525,4 @@ public class GeomBuilder
               );
       } /*MakeObj*/
 
-  } /*GeomBuilder*/
+  } /*GeomBuilder*/;
