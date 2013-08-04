@@ -33,9 +33,9 @@ public class Rotation implements android.os.Parcelable
       /* constructs a Rotation that rotates by the specified angle
         about the axis direction (X, Y, Z). */
       {
-        final float Cos = android.util.FloatMath.cos((float)Math.toRadians(AngleDegrees / 2));
-        final float Sin = android.util.FloatMath.sin((float)Math.toRadians(AngleDegrees / 2));
-        final float Mag = android.util.FloatMath.sqrt(X * X + Y * Y + Z * Z);
+        final float Cos = (float)Math.cos(Math.toRadians(AngleDegrees / 2));
+        final float Sin = (float)Math.sin(Math.toRadians(AngleDegrees / 2));
+        final float Mag = (float)Math.sqrt(X * X + Y * Y + Z * Z);
         c = Cos;
         x = Sin * X / Mag;
         y = Sin * Y / Mag;
@@ -147,7 +147,7 @@ public class Rotation implements android.os.Parcelable
       )
       /* returns the specified fraction of the rotation. */
       {
-        final float Mag = android.util.FloatMath.sqrt(x * x + y * y + z * z);
+        final float Mag = (float)Math.sqrt(x * x + y * y + z * z);
         return
             Mag != 0.0f ?
                 new Rotation((float)Math.toDegrees(2 * Math.atan2(Mag, c) * Frac), x / Mag, y / Mag, z / Mag)
@@ -158,7 +158,7 @@ public class Rotation implements android.os.Parcelable
     public void Apply()
       /* applies the rotation to the currently-selected GL matrix. */
       {
-        final float Mag = android.util.FloatMath.sqrt(x * x + y * y + z * z);
+        final float Mag = (float)Math.sqrt(x * x + y * y + z * z);
         if (Mag != 0.0f)
           {
             gl.glRotatef((float)Math.toDegrees(2 * Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag);

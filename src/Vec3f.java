@@ -17,8 +17,6 @@ package nz.gen.geek_central.GLUseful;
     the License.
 */
 
-import android.util.FloatMath;
-
 public class Vec3f
   /* 3D vectors */
   {
@@ -167,14 +165,14 @@ public class Vec3f
         /* returns the angle between the x-y plane and the line from the origin to the point. */
       {
         return
-            (float)Math.atan2(z, FloatMath.sqrt(x * x + y * y));
+            (float)Math.atan2(z, (float)Math.sqrt(x * x + y * y));
       } /*elevation*/
 
     public float abs()
         /* returns the distance between the point and the origin. */
       {
         return
-            android.util.FloatMath.sqrt((x * x + y * y + z * z) / (w * w));
+            (float)Math.sqrt((x * x + y * y + z * z) / (w * w));
       } /*abs*/
 
     public Vec3f unit()
