@@ -441,7 +441,7 @@ public class ObjReader
                 Result;
           } /*GetFloat*/
 
-        public GeomBuilder.Vec3f GetVec
+        public Vec3f GetVec
           (
             int MinD, /* [1 .. 3] */
             int MaxD /* [3 .. 4] */
@@ -455,7 +455,7 @@ public class ObjReader
                     NextSym(MinD == 4)
                 :
                     null;
-            /*final*/ GeomBuilder.Vec3f Result
+            /*final*/ Vec3f Result
                 = null; /*sigh*/
             try
               {
@@ -474,7 +474,7 @@ public class ObjReader
                         Float.parseFloat(WStr)
                     :
                         1.0f;
-                Result = new GeomBuilder.Vec3f
+                Result = new Vec3f
                   (
                     Float.parseFloat(XStr) / W,
                     Y / W,
@@ -556,7 +556,7 @@ public class ObjReader
 
     public static class Model
       {
-        public final GeomBuilder.Vec3f BoundMin, BoundMax;
+        public final Vec3f BoundMin, BoundMax;
 
         private static class Component
           {
@@ -579,8 +579,8 @@ public class ObjReader
         private Model
           (
             Component[] Components,
-            GeomBuilder.Vec3f BoundMin,
-            GeomBuilder.Vec3f BoundMax
+            Vec3f BoundMin,
+            Vec3f BoundMax
           )
           {
             this.Components = Components;
@@ -610,7 +610,7 @@ public class ObjReader
     throws DataFormatException
       {
         final ObjTokenizer Parse = new ObjTokenizer(From);
-        ArrayList<GeomBuilder.Vec3f>
+        ArrayList<Vec3f>
             Vertices = null,
             TexCoords = null,
             Normals = null;
@@ -618,7 +618,7 @@ public class ObjReader
         MaterialSet LoadedMaterials = new MaterialSet();
         final ArrayList<Model.Component> ModelComponents = new ArrayList<Model.Component>();
         Material CurMaterial = new Material("");
-        GeomBuilder.Vec3f
+        Vec3f
             BoundMin = null,
             BoundMax = null;
         for (;;)
@@ -679,7 +679,7 @@ public class ObjReader
                     if (BoundMin != null)
                       {
                         BoundMin =
-                            new GeomBuilder.Vec3f
+                            new Vec3f
                               (
                                 Math.min(BoundMin.x, NewObj.BoundMin.x),
                                 Math.min(BoundMin.y, NewObj.BoundMin.y),
@@ -693,7 +693,7 @@ public class ObjReader
                     if (BoundMax != null)
                       {
                         BoundMax =
-                            new GeomBuilder.Vec3f
+                            new Vec3f
                               (
                                 Math.max(BoundMax.x, NewObj.BoundMax.x),
                                 Math.max(BoundMax.y, NewObj.BoundMax.y),
@@ -719,28 +719,28 @@ public class ObjReader
               {
                 if (Op == "v")
                   {
-                    final GeomBuilder.Vec3f Vec = Parse.GetVec(3, 4);
+                    final Vec3f Vec = Parse.GetVec(3, 4);
                     if (Vertices == null)
                       {
-                        Vertices = new ArrayList<GeomBuilder.Vec3f>();
+                        Vertices = new ArrayList<Vec3f>();
                       } /*if*/
                     Vertices.add(Vec);
                   }
                 else if (Op == "vt")
                   {
-                    final GeomBuilder.Vec3f Vec = Parse.GetVec(1, 3);
+                    final Vec3f Vec = Parse.GetVec(1, 3);
                     if (TexCoords == null)
                       {
-                        TexCoords = new ArrayList<GeomBuilder.Vec3f>();
+                        TexCoords = new ArrayList<Vec3f>();
                       } /*if*/
                     TexCoords.add(Vec);
                   }
                 else if (Op == "vn")
                   {
-                    final GeomBuilder.Vec3f Vec = Parse.GetVec(3, 3);
+                    final Vec3f Vec = Parse.GetVec(3, 3);
                     if (Normals == null)
                       {
-                        Normals = new ArrayList<GeomBuilder.Vec3f>();
+                        Normals = new ArrayList<Vec3f>();
                       } /*if*/
                     Normals.add(Vec);
                   }

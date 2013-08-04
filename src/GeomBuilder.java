@@ -30,33 +30,14 @@ public class GeomBuilder
     Helper class for easier construction of geometrical
     objects. Instantiate this and tell it whether each vertex will
     also have a normal vector, a texture-coordinate vector or a
-    colour. Then call Add to add vertex definitions (using class
-    GeomBuilder.Vec3f to define points, and GeomBuilder.Color to
-    define colours), and use the returned vertex indices to construct
-    faces with AddTri and AddQuad. Finally, call MakeObj to obtain a
-    GeomBuilder.Obj that has a Draw method that will render the
-    resulting geometry into a specified GL context.
+    colour. Then call Add to add vertex definitions (using class Vec3f
+    to define points, and GeomBuilder.Color to define colours), and
+    use the returned vertex indices to construct faces with AddTri and
+    AddQuad. Finally, call MakeObj to obtain a GeomBuilder.Obj that
+    has a Draw method that will render the resulting geometry into a
+    specified GL context.
   */
   {
-
-    public static class Vec3f
-      /* 3D vectors/points */
-      {
-        public final float x, y, z;
-
-        public Vec3f
-          (
-            float x,
-            float y,
-            float z
-          )
-          {
-            this.x = x;
-            this.y = y;
-            this.z = z;
-          } /*Vec3f*/
-
-      } /*Vec3f*/
 
     public static class Color
       /* RGB colours with transparency */
@@ -235,27 +216,8 @@ public class GeomBuilder
         final Vec3f
             V1 = TempPoints.get(Vertices[0]),
             V2 = TempPoints.get(Vertices[1]),
-            V3 = TempPoints.get(Vertices[2]),
-            dV1 = new Vec3f(V2.x - V1.x, V2.y - V1.y, V2.z - V1.z),
-            dV2 = new Vec3f(V3.x - V2.x, V3.y - V2.y, V3.z - V2.z);
-        Vec3f FaceNormal =
-            new Vec3f
-              (
-                dV1.y * dV2.z - dV1.z * dV2.y,
-                dV1.z * dV2.x - dV1.x * dV2.z,
-                dV1.x * dV2.y - dV1.y * dV2.x
-              ); /* cross-product */
-        final float Magnitude =
-            android.util.FloatMath.sqrt
-              (
-                    FaceNormal.x * FaceNormal.x
-                +
-                    FaceNormal.y * FaceNormal.y
-                +
-                    FaceNormal.z * FaceNormal.z
-              );
-        FaceNormal =
-            new Vec3f(FaceNormal.x / Magnitude, FaceNormal.y / Magnitude, FaceNormal.z / Magnitude);
+            V3 = TempPoints.get(Vertices[2]);
+        final Vec3f FaceNormal = (V2.sub(V1)).cross(V3.sub(V2)).unit();
         final int[] NewVertices = new int[Vertices.length];
         for (int i = 0; i < Vertices.length; ++i)
           {
