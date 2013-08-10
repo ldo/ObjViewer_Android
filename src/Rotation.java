@@ -21,7 +21,9 @@ import static nz.gen.geek_central.GLUseful.GLUseful.gl;
 
 public class Rotation implements android.os.Parcelable
   {
-    public final float c, x, y, z;
+    public final float c, s; /* cosine and sine of half the rotation angle */
+    public final float x, y, z; /* rotation axis unit vector */
+  /* actually quaternion is (c, s * x, s * y, s * z) */
 
     public Rotation
       (
@@ -35,13 +37,12 @@ public class Rotation implements android.os.Parcelable
         about the axis direction (X, Y, Z). */
       {
         final double Theta = (Degrees ? Math.toRadians(Angle) : Angle) / 2;
-        final float Cos = (float)Math.cos(Theta);
-        final float Sin = (float)Math.sin(Theta);
+        c = (float)Math.cos(Theta);
+        s = (float)Math.sin(Theta);
         final float Mag = (float)Math.sqrt(X * X + Y * Y + Z * Z);
-        c = Cos;
-        x = Sin * X / Mag;
-        y = Sin * Y / Mag;
-        z = Sin * Z / Mag;
+        x = X / Mag;
+        y = Y / Mag;
+        z = Z / Mag;
       } /*Rotation*/
 
     public Rotation
@@ -68,6 +69,25 @@ public class Rotation implements android.os.Parcelable
         this does not compensate for accumulated rounding errors. */
       {
         this.c = c;
+        this.s = (float)Math.sqrt(x * x + y * y + z * z);
+        this.x = x / this.s;
+        this.y = y / this.s;
+        this.z = z / this.s;
+      } /*Rotation*/
+
+    private Rotation
+      (
+        float c,
+        float s,
+        float x,
+        float y,
+        float z
+      )
+      /* internal-use constructor with directly-computed components. Note
+        this does not compensate for accumulated rounding errors. */
+      {
+        this.c = c;
+        this.s = s;
         this.x = x;
         this.y = y;
         this.z = z;
@@ -87,6 +107,7 @@ public class Rotation implements android.os.Parcelable
                     new Rotation
                       (
                         MyState.getFloat("c", Null.c),
+                        MyState.getFloat("s", Null.s),
                         MyState.getFloat("x", Null.x),
                         MyState.getFloat("y", Null.y),
                         MyState.getFloat("z", Null.z)
@@ -120,6 +141,7 @@ public class Rotation implements android.os.Parcelable
       {
         final android.os.Bundle MyState = new android.os.Bundle();
         MyState.putFloat("c", c);
+        MyState.putFloat("s", s);
         MyState.putFloat("x", x);
         MyState.putFloat("y", y);
         MyState.putFloat("z", z);
@@ -131,7 +153,7 @@ public class Rotation implements android.os.Parcelable
         the same angle around the opposite-pointing axis . */
       {
         return
-            new Rotation(c, -x, -y, -z);
+            new Rotation(c, -s, x, y, z);
       } /*inv*/
 
     public Rotation mul
@@ -140,13 +162,14 @@ public class Rotation implements android.os.Parcelable
       )
       /* returns composition with another rotation. */
       {
+        final float s2 = this.s * that.s;
         return
             new Rotation
               (
-                this.c * that.c - this.x * that.x - this.y * that.y - this.z * that.z,
-                this.y * that.z - this.z * that.y + this.c * that.x + that.c * this.x,
-                this.z * that.x - this.x * that.z + this.c * that.y + that.c * this.y,
-                this.x * that.y - this.y * that.x + this.c * that.z + that.c * this.z
+                this.c * that.c - (this.x * that.x + this.y * that.y + this.z * that.z) * s2,
+                (this.y * that.z - this.z * that.y) * s2 + this.c * that.x * that.s + that.c * this.x * this.s,
+                (this.z * that.x - this.x * that.z) * s2 + this.c * that.y * that.s + that.c * this.y * this.s,
+                (this.x * that.y - this.y * that.x) * s2 + this.c * that.z * that.s + that.c * this.z * this.s
               );
       } /*mul*/
 
@@ -156,15 +179,11 @@ public class Rotation implements android.os.Parcelable
       )
       /* returns the specified fraction of the rotation. */
       {
-        final float Mag = (float)Math.sqrt(x * x + y * y + z * z);
         return
-            Mag != 0.0f ?
-                new Rotation
-                  (
-                    GetAngle(false) * Frac, false, x / Mag, y / Mag, z / Mag
-                  )
-            :
-                Null;
+            new Rotation
+              (
+                GetAngle(false) * Frac, false, x, y, z
+              );
       } /*mul*/
 
     public float GetAngle
@@ -173,29 +192,21 @@ public class Rotation implements android.os.Parcelable
       )
       /* returns the rotation angle. */
       {
-        final double Theta = Math.atan2(Math.sqrt(x * x + y * y + z * z), c);
+        final double Theta = Math.atan2(s, c);
         return
             2 * (float)(Degrees ? Math.toDegrees(Theta) : Theta);
       } /*GetAngle*/
 
     public Vec3f GetAxis()
       {
-        final float Mag = (float)Math.sqrt(x * x + y * y + z * z);
         return
-            Mag != 0.0f ?
-                new Vec3f(x / Mag, y / Mag, z / Mag)
-            :
-                new Vec3f(Null.x, Null.y, Null.z);
+            new Vec3f(x, y, z);
       } /*GetAxis*/
 
     public void Apply()
       /* applies the rotation to the currently-selected GL matrix. */
       {
-        final float Mag = (float)Math.sqrt(x * x + y * y + z * z);
-        if (Mag != 0.0f)
-          {
-            gl.glRotatef(2 * (float)Math.toDegrees(Math.atan2(Mag, c)), x / Mag, y / Mag, z / Mag);
-          } /*if*/
+        gl.glRotatef(GetAngle(true), x, y, z);
       } /*Apply*/
 
     public String toString()
