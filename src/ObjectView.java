@@ -224,7 +224,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
             this.StartRotation = StartRotation;
             this.DeltaRotation = EndRotation.mul(StartRotation.inv());
             CurrentAnim = this;
-            getHandler().post(this);
+            post(this);
           } /*RotationAnimator*/
 
         public void run()
@@ -236,7 +236,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
             requestRender();
             if (CurrentTime < EndTime)
               {
-                getHandler().post(this);
+                post(this);
               }
             else
               {
