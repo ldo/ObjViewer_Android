@@ -173,9 +173,19 @@ public class Rotation implements android.os.Parcelable
               );
       } /*mul*/
 
+    public Rotation div
+      (
+        Rotation that
+      )
+      /* returns the difference from another rotation. */
+      {
+        return
+            mul(that.inv());
+      } /*div*/
+
     public Rotation mul
       (
-        float Frac
+        float Frac /* can also be negative or > 1 */
       )
       /* returns the specified fraction of the rotation. */
       {
