@@ -111,7 +111,7 @@ public class GeomBuilder
           {
             throw new RuntimeException("missing or redundant args specified");
           } /*if*/
-        final int Result = AutoNormals && TempPoints != null ? TempPoints.size() : Points.size();
+        final int Result = AutoNormals ? TempPoints.size() : Points.size();
         (AutoNormals ? TempPoints : Points).add(Vertex);
         if (!AutoNormals)
           {
@@ -190,7 +190,7 @@ public class GeomBuilder
       {
         if (!AutoNormals)
           {
-            throw new RuntimeException("GeomBuilder.AddCopy shouldn’t be called if not AutoNormals");
+            throw new RuntimeException("GeomBuilder.AddActual shouldn’t be called if not AutoNormals");
           } /*if*/
         return
             Add
