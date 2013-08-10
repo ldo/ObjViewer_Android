@@ -339,7 +339,7 @@ public class Main extends android.app.Activity
                         Angle = Rand() * 360.0f;
                     TheObjectView.SetOrientation
                       (
-                        new nz.gen.geek_central.GLUseful.Rotation(Angle, X / R, Y / R, Z / R),
+                        new nz.gen.geek_central.GLUseful.Rotation(Angle, true, X / R, Y / R, Z / R),
                         true
                       );
                   } /*run*/

@@ -307,7 +307,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                       /* radial movement, for rotation about X and Y axes */
                     final float ZAngle =
                         Radius / (float)Math.hypot(MidPoint.x, MidPoint.y) >= 0.5 ?
-                            (float)Math.toDegrees
+                            (float)
                               (
                                     Math.atan2
                                       (
@@ -326,7 +326,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                     CurRotation =
                             new Rotation /* X+Y axis */
                               (
-                                (float)Math.toDegrees
+                                (float)
                                   (
                                     Math.asin
                                       (
@@ -337,13 +337,14 @@ public class ObjectView extends android.opengl.GLSurfaceView
                                                 axis is equal to radius of view */
                                       )
                                   ),
+                                false,
                                 (ThisMouse.y - MidPoint.y) / Radius,
                                 (ThisMouse.x - MidPoint.x) / Radius,
                                 0
                               )
                         .mul
                           (
-                            new Rotation(ZAngle, 0, 0, -1) /* Z axis */
+                            new Rotation(ZAngle, false, 0, 0, -1) /* Z axis */
                           )
                         .mul
                           (
