@@ -215,9 +215,9 @@ public class Rotation implements android.os.Parcelable
             String.format
               (
                 GLUseful.StdLocale,
-                "Rotation(%e, %e, %e, %e)",
-                c, x, y, z
+                "Rotation(%e, %e, %e, %e, %e)",
+                c, s, x, y, z
               );
       } /*toString*/
 
-  } /*Rotation*/
+  } /*Rotation*/;
