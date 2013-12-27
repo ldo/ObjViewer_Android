@@ -36,7 +36,7 @@ public class Rotation implements android.os.Parcelable
       /* constructs a Rotation that rotates by the specified angle
         about the axis direction (X, Y, Z). */
       {
-        final double Theta = (Degrees ? Math.toRadians(Angle) : Angle) / 2;
+        final double Theta = Float.isNaN(Angle) ? 0.0 : (Degrees ? Math.toRadians(Angle) : Angle) / 2;
         c = (float)Math.cos(Theta);
         s = (float)Math.sin(Theta);
         final float Mag = (float)Math.sqrt(X * X + Y * Y + Z * Z);
