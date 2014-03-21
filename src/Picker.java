@@ -1,8 +1,8 @@
-package nz.gen.geek_central.ObjViewer;
+package nz.gen.geek_central.ObjViewer; /* must be in same package as app in order to find resources */
 /*
-    let the user choose an obj file to load
+    let the user choose a file to load
 
-    Copyright 2011, 2013 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
+    Copyright 2011-2014 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not
     use this file except in compliance with the License. You may obtain a copy of
@@ -21,7 +21,8 @@ import android.view.View;
 
 public class Picker extends android.app.Activity
   {
-    public static final String LookInID = "nz.gen.geek_central.ObjViewer.Picker.LookIn";
+    public static final String LookInID = "nz.gen.geek_central.android.useful.Picker.LookIn";
+    public static final String ExtensionID = "nz.gen.geek_central.android.useful.Picker.Extension";
 
     android.widget.ListView PickerListView;
     SelectedItemAdapter PickerList;
@@ -141,10 +142,10 @@ public class Picker extends android.app.Activity
     @Override
     public void onCreate
       (
-        android.os.Bundle savedInstanceState
+        android.os.Bundle ToRestore
       )
       {
-        super.onCreate(savedInstanceState);
+        super.onCreate(ToRestore);
         setContentView(R.layout.picker);
         PickerList = new SelectedItemAdapter(this, R.layout.picker_item, getLayoutInflater());
         PickerListView = (android.widget.ListView)findViewById(R.id.item_list);
@@ -154,14 +155,24 @@ public class Picker extends android.app.Activity
           {
             final String ExternalStorage =
                 android.os.Environment.getExternalStorageDirectory().getAbsolutePath();
+            final String Extension = getIntent().getStringExtra(ExtensionID);
             for (String Here : getIntent().getStringArrayExtra(LookInID))
               {
-                final java.io.File ThisDir = new java.io.File(ExternalStorage + "/" + Here);
+                final java.io.File ThisDir = new java.io.File
+                  (
+                        (Here.startsWith("/") ?
+                            ""
+                        :
+                            ExternalStorage + "/"
+                        )
+                    +
+                        Here
+                  );
                 if (ThisDir.isDirectory())
                   {
                     for (java.io.File Item : ThisDir.listFiles())
                       {
-                        if (Item.getName().endsWith(".obj"))
+                        if (Item.getName().endsWith(Extension))
                           {
                             PickerList.add(new PickerItem(Item.getAbsolutePath()));
                           } /*if*/

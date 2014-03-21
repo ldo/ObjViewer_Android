@@ -2,7 +2,7 @@ package nz.gen.geek_central.ObjViewer;
 /*
     ObjViewer -- viewer for .obj files -- mainline.
 
-    Copyright 2011, 2013 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
+    Copyright 2011-2014 by Lawrence D'Oliveiro <ldo@geek-central.gen.nz>.
 
     Licensed under the Apache License, Version 2.0 (the "License"); you may not
     use this file except in compliance with the License. You may obtain a copy of
@@ -183,7 +183,7 @@ public class Main extends android.app.Activity
         @Override
         public void onCreate
           (
-            android.os.Bundle savedInstanceState
+            android.os.Bundle ToRestore
           )
           {
             setTitle(Title);
@@ -239,6 +239,7 @@ public class Main extends android.app.Activity
                       (
                         new android.content.Intent(android.content.Intent.ACTION_PICK)
                             .setClass(Main.this, Picker.class)
+                            .putExtra(Picker.ExtensionID, ".obj")
                             .putExtra
                               (
                                 Picker.LookInID,
@@ -380,10 +381,10 @@ public class Main extends android.app.Activity
     @Override
     public void onCreate
       (
-        android.os.Bundle SavedInstanceState
+        android.os.Bundle ToRestore
       )
       {
-        super.onCreate(SavedInstanceState);
+        super.onCreate(ToRestore);
         setContentView(R.layout.main);
         TheObjectView = (ObjectView)findViewById(R.id.object_view);
         BuildActivityResultActions();
@@ -392,15 +393,15 @@ public class Main extends android.app.Activity
           {
             TheObjectView.SetObject(PreviousModel);
           } /*if*/
-        if (SavedInstanceState != null)
+        if (ToRestore != null)
           {
           /* reload previously-viewed object */
-            CurObjFileName = SavedInstanceState.getString(CurFileKey);
+            CurObjFileName = ToRestore.getString(CurFileKey);
             if (PreviousModel == null && CurObjFileName != null)
               {
                 TheObjectView.SetObject(ReadObj(CurObjFileName));
               } /*if*/
-            TheObjectView.onRestoreInstanceState(SavedInstanceState.getParcelable("ObjectView"));
+            TheObjectView.onRestoreInstanceState(ToRestore.getParcelable("ObjectView"));
               /* doesn't seem to be done by GLSurfaceView */
           }
         else
@@ -463,15 +464,15 @@ public class Main extends android.app.Activity
     @Override
     public void onSaveInstanceState
       (
-        android.os.Bundle SavedInstanceState
+        android.os.Bundle ToRestore
       )
       {
         if (CurObjFileName != null)
           {
           /* remember what file I was looking at */
-            SavedInstanceState.putString(CurFileKey, CurObjFileName);
+            ToRestore.putString(CurFileKey, CurObjFileName);
           } /*if*/
-        SavedInstanceState.putParcelable("ObjectView", TheObjectView.onSaveInstanceState());
+        ToRestore.putParcelable("ObjectView", TheObjectView.onSaveInstanceState());
           /* doesn't seem to be done by GLSurfaceView */
       } /*onSaveInstanceState*/
 
