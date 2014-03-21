@@ -21,8 +21,12 @@ import android.view.View;
 
 public class Picker extends android.app.Activity
   {
+  /* required extra information passed in launch intent: */
     public static final String LookInID = "nz.gen.geek_central.android.useful.Picker.LookIn";
+      /* array of strings representing names of directories in which to look for files */
+      /* ones not beginning with “/” are interpreted as subdirectories in external storage */
     public static final String ExtensionID = "nz.gen.geek_central.android.useful.Picker.Extension";
+      /* extension of filenames to show */
 
     android.widget.ListView PickerListView;
     SelectedItemAdapter PickerList;
