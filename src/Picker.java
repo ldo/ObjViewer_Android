@@ -206,7 +206,6 @@ public class Picker extends android.app.Activity
                       } /*for*/
                     if (Selected != null)
                       {
-                        System.err.printf("ObjViewer.Picker returning “%s”\n", Selected.FullPath); /* debug */
                         setResult
                           (
                             android.app.Activity.RESULT_OK,
