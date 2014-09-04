@@ -71,7 +71,7 @@
             signedjar="${out.unaligned.file}"
             verbose="true"
         />
-        <exec executable="${sdk.dir}/tools/zipalign">
+        <exec executable="${android.build.tools.dir}/zipalign">
             <arg value="-f"/>
             <arg value="-v"/>
             <arg value="4"/>
