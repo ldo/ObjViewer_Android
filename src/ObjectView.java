@@ -149,7 +149,7 @@ public class ObjectView extends android.opengl.GLSurfaceView
                   );
                 gl.glFrontFace
                   (
-                    ClockwiseFaces ? 
+                    ClockwiseFaces ?
                         gl.GL_CW
                     :
                         gl.GL_CCW

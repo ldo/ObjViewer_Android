@@ -66,7 +66,7 @@ public class Main extends android.app.Activity
         public void Set
           (
             int SelectedID
-          ); 
+          );
       } /*SelectedIDAction*/
 
     private ObjReader.Model ReadObj
