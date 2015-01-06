@@ -31,7 +31,7 @@ the JDK keytool command, something like this:
 
     keytool -genkeypair -keystore keystorename -storepass keystorepassword \
         -keyalg RSA -validity $((25 * 365)) -alias keyalias -keysize 2048 \
-        -dname "CN=J Random Hacker, O=HackerCo, L=Anytown, ST=Anystate, C=US" 
+        -dname "CN=J Random Hacker, O=HackerCo, L=Anytown, ST=Anystate, C=US"
 
 substituting your own filename for keystorename, your own password
 for keystorepassword, your own name for the key for keyalias, and of course
