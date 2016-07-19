@@ -67,6 +67,8 @@
         <property name="out.unaligned.file" location="${out.absolute.dir}/${ant.project.name}-release-unaligned.apk" />
         <signjar
             keystore="${keystore.path}" alias="${keystore.alias}" storepass="${keystore.password}"
+            sigalg="SHA1withRSA"
+            digestalg="SHA1"
             jar="${out.packaged.file}"
             signedjar="${out.unaligned.file}"
             verbose="true"
